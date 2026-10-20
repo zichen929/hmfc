@@ -4,7 +4,11 @@
 
 源文档的实际文件名为 `obsidian-vault/04-writing/tcst26/TCST26E3.md`，一级标题是 `TCST26`；本实现对应其中的 **IAC 1: Task-Space Control, Uncertain Surface Angle** 及两连杆机器人附录。
 
+四个 FIC 的主调节工况已对齐本文件的默认工况：相同机器人参数、水平面、初始接触位置、零初速、8 cm 目标位移、运动增益、10 N 接触力、6 秒积分及 0.002 秒输出间隔。FIC 的 `regulation, kf=0` 提供已知真实法向的基准，IAC 1 的主工况保留 +5° 初始估计偏差。两套代码独立保存参数，不互相调用；FIC 的跟踪与其他力增益，以及 IAC 1 的估计器交叉验证，仍作为各自的补充测试。
+
 ## 运行
+
+本文件的 `iac1_simulation` 仅运行 IAC 1。如需重新运行并比较 FIC 1、NAC 1 和 IAC 1，使用 `comparison = fic1_nac1_iac1_simulation;`，结果另存至 `results/fic1_nac1_iac1/`；详见 [三控制器对比说明](FIC1_NAC1_IAC1_README.md)。
 
 在本目录执行：
 

@@ -6,9 +6,10 @@ function results = fic_simulation(controllerId, makePlots, outputDir)
 %   FIC 3 directly uses scalar intrinsic errors to form ut, then up = T*ut.
 %   FIC 4 projects Cartesian references into intrinsic coordinates before
 %   applying the scalar feedback law shared with FIC 3.
-%   Source: obsidian-vault/04-writing/tcst26/TCST26E3-EN.md,
+%   Source: obsidian-vault/04-writing/tcst26/TCST26E3.md,
 %   "FIC 1" through "FIC 4", and "2-DoF Planar Robot Arm Manipulator".
-%   The numerical parameters below are illustrative, not specified by the note.
+%   The main regulation scenario matches standalone iac1_simulation.m.
+%   Values are duplicated deliberately to keep FIC and IAC independent.
 %
 %   The ODE state is z = [s; v], with p = p0 + T*s and pdot = T*v.
 %   This eliminates the holonomic rigid-contact constraint without penalty
@@ -28,8 +29,8 @@ if nargin < 3
 end
 if ~exist(outputDir, 'dir'), mkdir(outputDir); end
 cfg = configuration();
-options = odeset('RelTol', 1e-9, 'AbsTol', 1e-11, 'MaxStep', 0.02);
-time = (0:0.01:12)';
+options = odeset('RelTol', 1e-9, 'AbsTol', 1e-11, 'MaxStep', 0.01);
+time = linspace(0,cfg.duration,ceil(cfg.duration/cfg.outputStep)+1)';
 modes = {'regulation', 'tracking'};
 forceGains = [0, 2];
 results = struct();
@@ -37,10 +38,10 @@ results.config = cfg;
 results.controllerId = controllerId;
 results.controller = sprintf('FIC %d',controllerId);
 results.odeOptions = options;
-results.source = 'obsidian-vault/04-writing/tcst26/TCST26E3-EN.md';
+results.source = 'obsidian-vault/04-writing/tcst26/TCST26E3.md';
 results.cases = struct([]);
 
-fprintf('FIC %d: exact-model 2R arm, rigid frictionless bilateral contact\n',controllerId);
+fprintf('FIC %d: exact-model 2R arm, maintained rigid frictionless unilateral contact\n',controllerId);
 fprintf('kp = %.1f, kv = %.1f, fd = %.1f N; contact slope = %.1f deg\n', ...
     cfg.kp, cfg.kv, cfg.fd, cfg.surfaceAngle * 180 / pi);
 fprintf('Error poles: %s\n', mat2str(roots([1, cfg.kv, cfg.kp]), 5));
@@ -91,20 +92,24 @@ fprintf('All numerical checks passed. Results: %s\n', outputDir);
 end
 
 function c = configuration()
-c.l1 = 0.7; c.l2 = 0.5;
+c.l1 = 0.6; c.l2 = 0.5;
 c.m1 = 2.0; c.m2 = 1.5;
 c.lc1 = c.l1/2; c.lc2 = c.l2/2;
 c.I1 = c.m1*c.l1^2/12; c.I2 = c.m2*c.l2^2/12;
 c.g = 9.81;
-c.kp = 16; c.kv = 6; c.fd = 10;
-c.surfaceAngle = 25*pi/180;
+c.kp = 25; c.kv = 10; c.fd = 10;
+c.surfaceAngle = 0;
 c.n = [-sin(c.surfaceAngle); cos(c.surfaceAngle)];
 c.T = [0,1;-1,0]*c.n;
-c.q0 = [0.35; 1.35];
-c.p0 = forwardKinematics(c.q0, c); % p0 is the FIRST contact point.
-c.initialVelocity = -0.035; % Tangential velocity; normal velocity is zero.
-c.minSinQ2 = 0.2; % Explicit nonsingular operating-region guard.
-c.setpoint = c.p0 + c.T*0.12;
+c.p0 = [0.6;0.4]; % FIRST contact point, identical to IAC 1.
+c.initialVelocity = 0;
+c.q2Min = 70*pi/180; c.q2Max = 115*pi/180;
+c.minSinQ2 = min(sin([c.q2Min,c.q2Max]));
+c.xMin = -0.04; c.xMax = 0.16;
+c.q0 = inverseKinematics(c.p0,c); % Same positive-elbow branch as IAC 1.
+c.targetX = 0.08;
+c.setpoint = c.p0 + c.T*c.targetX;
+c.duration = 6; c.outputStep = 0.002;
 end
 
 function dz = plantODE(t, z, c, mode, kf, controllerId)
@@ -114,6 +119,8 @@ end
 
 function a = evaluatePlant(t, z, c, mode, kf, controllerId)
 % Geometry is used by the PLANT coordinate chart, not as scalar feedback.
+assert(z(1)>c.xMin && z(1)<c.xMax,'FIC:Region', ...
+    'Tangential coordinate left the common FIC/IAC operating region.');
 p = c.p0 + c.T*z(1);
 q = inverseKinematics(p, c);
 [~, ~, ~, J] = robotModel(q, zeros(2,1), c);
@@ -127,7 +134,7 @@ switch controllerId
         [pd, dpd, ddpd] = cartesianReference(t, c, mode);
     case {2,3}
         % FIC 2 maps these for feedback; FIC 3 uses the mapping for diagnostics.
-        [xtd, dxtd, ddxtd] = intrinsicReference(t, mode);
+        [xtd, dxtd, ddxtd] = intrinsicReference(t, c, mode);
         pd = c.p0 + c.T*xtd;
         dpd = c.T*dxtd;
         ddpd = c.T*ddxtd;
@@ -167,6 +174,7 @@ K = [M, -(1+kf)*Jn'; Jn, 0];
 sol = K\[tau0 - C*dq - G; -c.n'*Jdotdq];
 qdd = sol(1:2);
 f = sol(3); % Reaction force is obtained from the constrained plant solve.
+assert(f>0,'FIC:ContactLoss','The calculated unilateral reaction is not positive.');
 uf = c.fd + kf*(c.fd - f);
 F = eta + Lambda*up - c.n*uf;
 tau = J'*F;
@@ -231,12 +239,12 @@ switch mode
 end
 end
 
-function [xtd, dxtd, ddxtd] = intrinsicReference(t, mode)
+function [xtd, dxtd, ddxtd] = intrinsicReference(t, c, mode)
 % Input to FIC 2 and FIC 3: scalar desired position and its derivatives.
 % Kept separate from the FIC 1 Cartesian generator to exercise conversion.
 switch mode
     case 'regulation'
-        xtd = 0.12; dxtd = 0; ddxtd = 0;
+        xtd = c.targetX; dxtd = 0; ddxtd = 0;
     case 'tracking'
         xtd = 0.08 + 0.045*sin(0.8*t) + 0.02*cos(1.3*t);
         dxtd = 0.045*0.8*cos(0.8*t) - 0.02*1.3*sin(1.3*t);
@@ -258,6 +266,8 @@ assert(abs(cosq2) < 1, 'FIC:Workspace', ...
 q2 = acos(cosq2); % Positive-elbow branch, continuous with q0.
 assert(abs(sin(q2)) >= c.minSinQ2, 'FIC:Singularity', ...
     'Trajectory left the chosen region |sin(q2)| >= %.2f.', c.minSinQ2);
+assert(q2>c.q2Min && q2<c.q2Max,'FIC:Region', ...
+    'Elbow angle left the common [70,115] degree operating region.');
 q1 = atan2(p(2),p(1)) - atan2(c.l2*sin(q2), c.l1+c.l2*cos(q2));
 q = [q1; q2];
 end
@@ -345,6 +355,7 @@ assert(all(residuals < 1e-8), 'FIC:Residual', ...
     'A force, contact, dynamics, or Lyapunov residual exceeds tolerance.');
 assert(m.minSinQ2 >= c.minSinQ2 && m.minCartesianInertia > 0, ...
     'FIC:Region', 'Nonsingularity or positive inertia condition violated.');
+assert(m.minForce>0,'FIC:ContactLoss','Unilateral contact was not maintained.');
 if isfield(r,'et')
     assert(max(abs(r.intrinsicErrorResidual)) < 1e-8 ...
         && max(r.errorMappingResidual) < 1e-8, ...
@@ -371,7 +382,7 @@ plot(a.pd(:,1),a.pd(:,2),'k--','LineWidth',2);
 plot(a.p(:,1),a.p(:,2),'b-','LineWidth',1.3);
 plot(a.p(1,1),a.p(1,2),'go','MarkerFaceColor','g');
 axis equal; grid on; xlabel('p_1 (m)'); ylabel('p_2 (m)');
-title('Cartesian motion on the inclined contact line');
+title('Cartesian motion on the horizontal contact line');
 legend('Contact line','Reference','Actual','Initial contact','Location','best');
 nexttile;
 plot(t,(a.pd-c.p0')*c.T,'k--',t,a.z(:,1),'b-',t,b.z(:,1),'r:','LineWidth',1.4);
