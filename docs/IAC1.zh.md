@@ -1,5 +1,7 @@
 # IAC 1 独立 MATLAB ODE 仿真
 
+[English](IAC1.md) | [简体中文](IAC1.zh.md)
+
 入口为 `iac1_simulation.m`，只依赖 MATLAB 基础功能。模型、控制器、估计器、接触反力求解和绘图均为文件内的局部函数，没有调用或修改任何 FIC 代码。
 
 源文档的实际文件名为 `obsidian-vault/04-writing/tcst26/TCST26E3.md`，一级标题是 `TCST26`；本实现对应其中的 **IAC 1: Task-Space Control, Uncertain Surface Angle** 及两连杆机器人附录。
@@ -8,7 +10,7 @@
 
 ## 运行
 
-本文件的 `iac1_simulation` 仅运行 IAC 1。如需重新运行并比较 FIC 1、NAC 1 和 IAC 1，使用 `comparison = fic1_nac1_iac1_simulation;`，结果另存至 `results/fic1_nac1_iac1/`；详见 [三控制器对比说明](FIC1_NAC1_IAC1_README.md)。
+本文件的 `iac1_simulation` 仅运行 IAC 1。如需重新运行并比较 FIC 1、NAC 1 和 IAC 1，使用 `comparison = fic1_nac1_iac1_simulation;`，结果另存至 `results/fic1_nac1_iac1/`；详见 [三控制器对比说明](FIC1_NAC1_IAC1.zh.md)。
 
 在本目录执行：
 
@@ -28,7 +30,9 @@ results = iac1_simulation(struct('visible','off'));
 results = iac1_simulation(struct('makePlots',false,'saveResults',false));
 ```
 
-可以覆盖 `initialAngleDeg`、`initialVelocity`、`duration`、`outputDir`、`makePlots`、`saveResults` 和 `visible`。初始角度指定的是有效估计 `bar_theta(0)`，以度为单位，必须位于 ±6° 扇区；控制方程内部全部使用弧度。`duration` 至少为 6 秒，以便执行末端收敛检查。增大初始速度等操作仍须满足机器人运行区域，越界会停止并报错。
+可以覆盖 `initialAngleDeg`、`initialVelocity`、`duration`、`outputDir`、`makePlots`、`saveResults`、`visible`、`sectorHalfWidthDeg` 和 `sectorMarginDeg`。初始角度指定的是有效估计 `bar_theta(0)`，以度为单位，必须位于所选扇区；默认半宽仍为 6°。`sectorHalfWidthDeg` 可设为数值半宽，或字符串 `'supremum'`，后者根据当前惯量界计算严格上确界后减去正裕量 `sectorMarginDeg`（默认 `1e-6°`）。控制方程内部全部使用弧度。`duration` 至少为 6 秒，以便执行末端收敛检查。增大初始速度等操作仍须满足机器人运行区域，越界会停止并报错。
+
+默认闭扇区允许的最大初始有效角度偏差为 6°。max angle 入口 `fic1_nac1_iac1_max_angle_simulation` 则使用接近半宽上确界 16.981238° 的扇区和 +15° 初值，单独保存三控制器对比，详见 [普通与 max angle 工况说明](FIC1_NAC1_IAC1.zh.md)。
 
 ## 工况与模型
 
@@ -89,3 +93,10 @@ dot_hat   = gamma * T_c' * (g_p + bar_n * f)
 默认结果保存在 `results/iac1/`：完整 `iac1_results.mat`、四个工况的 CSV、包含误差与残差的 `verification.txt`，以及 `iac1_summary.png`、可编辑的 `iac1_summary.fig`。函数返回的 `results.runs` 包含全部信号与检查结果。
 
 这些是文档理想条件下的数值验证：精确模型、精确标量力测量、理想执行器和已建立的无摩擦刚性接触。仿真不包含建立接触、碰撞、脱离后的运动模式或测量噪声；负反力不会被截成零来掩盖接触失效。
+
+<!-- simulation-figures -->
+## 仿真结果图
+
+**独立 IAC 1：+5° 主工况及反向偏角、流形不变性、原地调节验证**
+
+![独立 IAC 1：+5° 主工况及反向偏角、流形不变性、原地调节验证](figures/iac1/iac1_summary.png)

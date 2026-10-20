@@ -10,7 +10,8 @@ function results = iac1_simulation(options)
 if nargin == 0, options = struct(); end
 defaults = struct('makePlots',true,'saveResults',true,'visible','on', ...
     'outputDir',fullfile(fileparts(mfilename('fullpath')),'results','iac1'), ...
-    'initialAngleDeg',5,'initialVelocity',0,'duration',6);
+    'initialAngleDeg',5,'initialVelocity',0,'duration',6, ...
+    'sectorHalfWidthDeg',6,'sectorMarginDeg',1e-6);
 assert(isstruct(options) && isscalar(options),'options must be a scalar struct.');
 names = fieldnames(options);
 for k = 1:numel(names)
@@ -21,6 +22,7 @@ options = defaults;
 validateattributes(options.initialAngleDeg,{'numeric'},{'real','finite','scalar'});
 validateattributes(options.initialVelocity,{'numeric'},{'real','finite','scalar'});
 validateattributes(options.duration,{'numeric'},{'real','finite','scalar','>=',6});
+validateattributes(options.sectorMarginDeg,{'numeric'},{'real','finite','scalar','positive'});
 
 % Exactly known 2R robot in the vertical plane; SI units throughout.
 r = struct('l1',0.6,'l2',0.5,'m1',2,'m2',1.5, ...
@@ -47,13 +49,26 @@ massMax = (A/r.l1^2+D/r.l2^2)/smin2;
 detLower = (A*D-B^2*cmax^2)/(r.l1^2*r.l2^2);
 massMin = detLower/massMax;
 chi = (massMax-massMin)/(2*sqrt(massMax*massMin));
+deltaSupremum=0.5*atan2(1,chi);
+if isequal(options.sectorHalfWidthDeg,'supremum')
+    c.delta=deltaSupremum-options.sectorMarginDeg*pi/180;
+else
+    validateattributes(options.sectorHalfWidthDeg,{'numeric'},{'real','finite','scalar','positive'});
+    assert(options.sectorHalfWidthDeg<deltaSupremum*180/pi,'IAC1:Sector', ...
+        'Sector half-width must be strictly below %.12g degrees.',deltaSupremum*180/pi);
+    c.delta=options.sectorHalfWidthDeg*pi/180;
+end
+assert(c.delta>0 && c.delta<deltaSupremum,'IAC1:Sector', ...
+    'Sector half-width must be strictly below %.12g degrees.',deltaSupremum*180/pi);
 rhoMin = cos(2*c.delta)-chi*sin(2*c.delta);
 assert(massMin>0 && rhoMin>0,'Angular sector cannot certify positive contact.');
 assert(abs(options.initialAngleDeg*pi/180)<=c.delta, ...
-    'Initial effective angle must be inside the +/-6 degree sector.');
+    'Initial effective angle must be inside the +/-%.12g degree sector.',c.delta*180/pi);
 certificate = struct('massMin',massMin,'massMax',massMax,'chi',chi, ...
     'rhoMin',rhoMin,'forceMin',rhoMin*c.fd, ...
-    'alphaZ',c.gamma*rhoMin*c.fd*cos(c.delta),'domain',domain);
+    'alphaZ',c.gamma*rhoMin*c.fd*cos(c.delta),'domain',domain, ...
+    'sectorHalfWidthSupremumDeg',deltaSupremum*180/pi, ...
+    'sectorHalfWidthUsedDeg',c.delta*180/pi);
 
 % The first case is the requested scenario. Opposite sign, invariant
 % manifold (nonzero momentum), and regulation from rest are cross-checks.
@@ -68,7 +83,7 @@ odeOptions = odeset('RelTol',1e-9,'AbsTol',[1e-11,1e-11,1e-12], ...
     'MaxStep',0.01,'Events',@(t,y) domain_events(t,y,r,plant,c,domain));
 tRequested = linspace(0,options.duration,ceil(options.duration/0.002)+1);
 fprintf('\nIAC 1: horizontal rigid contact, independent 2R model\n');
-fprintf('Certified f >= %.6f N; alpha_z = %.6f 1/s\n', ...
+fprintf('Certified f >= %.9g N; alpha_z = %.9g 1/s\n', ...
     certificate.forceMin,certificate.alphaZ);
 for k = 1:numel(cases)
     spec = cases(k);
@@ -342,7 +357,8 @@ assert(fid>=0,'Could not open verification output.');
 cleanup = onCleanup(@() fclose(fid));
 fprintf(fid,'IAC 1 independent ODE verification\nSource: %s\n',results.source);
 fprintf(fid,'ODE state: [x_t, dx_t, hat_theta]; exact active rigid contact.\n');
-fprintf(fid,'True surface: y=0.4 m, n=[0;1]. Sector: +/-6 deg.\n');
+fprintf(fid,'True surface: y=0.4 m, n=[0;1]. Sector: +/-%.12g deg.\n', ...
+    results.controller.delta*180/pi);
 fprintf(fid,'Analytic inertia bounds: [%.9g, %.9g] kg\n', ...
     results.certificate.massMin,results.certificate.massMax);
 fprintf(fid,'Certified force minimum: %.9g N; alpha_z: %.9g /s\n', ...

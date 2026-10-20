@@ -9,7 +9,8 @@ function results = nac1_simulation(options)
 if nargin==0, options=struct(); end
 defaults = struct('makePlots',true,'saveResults',true,'visible','on', ...
     'outputDir',fullfile(fileparts(mfilename('fullpath')),'results','nac1'), ...
-    'initialAngleDeg',5,'initialVelocity',0,'duration',6);
+    'initialAngleDeg',5,'initialVelocity',0,'duration',6, ...
+    'initialAngleLimitDeg',6,'enforceOperatingRegion',true);
 assert(isstruct(options)&&isscalar(options),'options must be a scalar struct.');
 names = fieldnames(options);
 for i=1:numel(names)
@@ -17,14 +18,17 @@ for i=1:numel(names)
     defaults.(names{i}) = options.(names{i});
 end
 options=defaults;
-validateattributes(options.initialAngleDeg,{'numeric'},{'real','finite','scalar','>=',-6,'<=',6});
+validateattributes(options.initialAngleLimitDeg,{'numeric'},{'real','finite','scalar','positive','<',90});
+validateattributes(options.initialAngleDeg,{'numeric'},{'real','finite','scalar', ...
+    '>=',-options.initialAngleLimitDeg,'<=',options.initialAngleLimitDeg});
 validateattributes(options.initialVelocity,{'numeric'},{'real','finite','scalar'});
 validateattributes(options.duration,{'numeric'},{'real','finite','scalar','>=',6});
 
 robot = struct('l1',0.6,'l2',0.5,'m1',2,'m2',1.5, ...
     'lc1',0.3,'lc2',0.25,'I1',2*0.6^2/12,'I2',1.5*0.5^2/12,'g',9.81);
 plant = struct('p0',[0.6;0.4],'n',[0;1],'T',[1;0], ...
-    'xMin',-0.04,'xMax',0.16,'q2Min',70*pi/180,'q2Max',115*pi/180);
+    'xMin',-0.04,'xMax',0.16,'q2Min',70*pi/180,'q2Max',115*pi/180, ...
+    'enforceOperatingRegion',options.enforceOperatingRegion);
 % Controller parameters contain no true normal or tangent.
 controller = struct('kp',25,'kv',10,'fd',10, ...
     'fixedAngle',options.initialAngleDeg*pi/180);
@@ -45,6 +49,10 @@ for kf=[0,2]
     results.cases = [results.cases;run];
     fprintf('%-10s kf=%g: final e=%+.6f mm, f=%.9f N; predicted e_inf=%+.6f mm\n', ...
         mode,kf,run.error(end)*1000,run.force(end),run.equilibrium.error*1000);
+    if ~run.operatingRegionSatisfied
+        fprintf('  Original certificate region exited at approximately %.6f s; exact robot model continued.\n', ...
+            run.firstRegionExitTime);
+    end
 end
 results.summary = struct2table([results.cases.metrics]);
 results.summary = addvars(results.summary,string({results.cases.mode})', ...
@@ -74,7 +82,9 @@ dy=[y(2);p.T'*a.acceleration];
 end
 
 function a = evaluate(t,y,r,p,c,task,mode,kf)
-assert(y(1)>p.xMin && y(1)<p.xMax,'NAC1:Region','Tangential domain exceeded.');
+if p.enforceOperatingRegion
+    assert(y(1)>p.xMin && y(1)<p.xMax,'NAC1:Region','Tangential domain exceeded.');
+end
 position=p.p0+p.T*y(1);
 velocity=p.T*y(2);
 m=robot_model(position,velocity,r,p);
@@ -125,7 +135,9 @@ function m=robot_model(position,velocity,r,p)
 cos2=(position'*position-r.l1^2-r.l2^2)/(2*r.l1*r.l2);
 assert(abs(cos2)<1,'NAC1:Workspace','Unreachable or singular position.');
 q2=acos(cos2);
-assert(q2>p.q2Min && q2<p.q2Max,'NAC1:Region','Elbow domain exceeded.');
+if p.enforceOperatingRegion
+    assert(q2>p.q2Min && q2<p.q2Max,'NAC1:Region','Elbow domain exceeded.');
+end
 q1=atan2(position(2),position(1))-atan2(r.l2*sin(q2),r.l1+r.l2*cos(q2));
 q=[q1;q2];
 J=[-r.l1*sin(q1)-r.l2*sin(q1+q2),-r.l2*sin(q1+q2); ...
@@ -150,7 +162,18 @@ end
 function eq=equilibrium(r,p,c,task,kf)
 % Offline prediction: true geometry is used here only for verification.
 % Variable inertia makes the regulation equilibrium an implicit equation.
-xstar=fzero(@balance,[p.xMin+1e-8,p.xMax-1e-8]);
+bracket=[p.xMin+1e-8,p.xMax-1e-8];
+if ~p.enforceOperatingRegion
+    % The certificate region is not a physical wall. Find the equilibrium
+    % on the same exact robot's reachable, nonsingular contact branch.
+    reach=sqrt((r.l1+r.l2)^2-p.p0(2)^2)-1e-3;
+    physical=[-reach-p.p0(1),reach-p.p0(1)];
+    for k=1:20
+        if balance(bracket(1))*balance(bracket(2))<=0, break; end
+        bracket=[max(physical(1),bracket(1)-0.04),min(physical(2),bracket(2)+0.04)];
+    end
+end
+xstar=fzero(@balance,bracket);
 [~,uf,f]=balance(xstar);
 eq=struct('x',xstar,'error',task.targetX-xstar,'force',f,'uf',uf);
     function [value,uf,f]=balance(x)
@@ -177,11 +200,19 @@ for i=1:numel(t)
     for j=1:numel(fields), run.(fields{j})(i,:)=a.(fields{j})(:)'; end
 end
 run.equilibrium=equilibrium(r,p,c,task,kf);
+inside=run.y(:,1)>p.xMin & run.y(:,1)<p.xMax & ...
+    run.q(:,2)>p.q2Min & run.q(:,2)<p.q2Max;
+run.operatingRegionSatisfied=all(inside);
+firstOutside=find(~inside,1);
+run.firstRegionExitTime=NaN;
+if ~isempty(firstOutside), run.firstRegionExitTime=t(firstOutside); end
 metrics=struct('finalError',run.error(end),'finalForce',run.force(end), ...
     'minForce',min(run.force),'maxForceError',max(abs(run.force-c.fd)), ...
     'tailRmsError',sqrt(mean(run.error(t>=t(end)-2).^2)), ...
     'predictedRegulationError',run.equilibrium.error, ...
-    'predictedRegulationForce',run.equilibrium.force);
+    'predictedRegulationForce',run.equilibrium.force, ...
+    'operatingRegionSatisfied',run.operatingRegionSatisfied, ...
+    'firstRegionExitTime_s',run.firstRegionExitTime);
 run.metrics=metrics;
 end
 
@@ -195,8 +226,8 @@ checks=struct('maxJointResidual',max(run.plantResidual), ...
 values=cell2mat(struct2cell(checks));
 assert(all(isfinite(run.y),'all') && all(values<1e-9),'NAC1:Dynamics','Dynamics check failed.');
 assert(all(run.force>0) && all(run.angle==c.fixedAngle));
-assert(all(run.y(:,1)>p.xMin & run.y(:,1)<p.xMax));
-assert(all(run.q(:,2)>p.q2Min & run.q(:,2)<p.q2Max));
+checks.operatingRegionSatisfied=run.operatingRegionSatisfied;
+if p.enforceOperatingRegion, assert(run.operatingRegionSatisfied); end
 if strcmp(run.mode,'regulation')
     checks.regulationEquilibriumError=abs(run.error(end)-run.equilibrium.error);
     checks.regulationEquilibriumForceError=abs(run.force(end)-run.equilibrium.force);
@@ -266,6 +297,7 @@ fprintf(fid,'True surface y=0.4 m; fixed angle %+.9g deg; kp=25, kv=10, fd=10 N.
     results.options.initialAngleDeg);
 fprintf(fid,'Same robot, initial state, reference, 6 s default duration and 0.002 s output as FIC/IAC.\n');
 fprintf(fid,'No adaptive states, momentum correction, or angle update.\n');
+fprintf(fid,'Original operating region enforced: %d\n',results.options.enforceOperatingRegion);
 for i=1:numel(results.cases)
     run=results.cases(i);
     fprintf(fid,'\n%s, kf=%g\nFinal error %.12g m; final force %.12g N; min force %.12g N\n', ...
@@ -276,6 +308,11 @@ for i=1:numel(results.cases)
     end
     fields=fieldnames(run.checks);
     for j=1:numel(fields), fprintf(fid,'%s: %.12g\n',fields{j},run.checks.(fields{j})); end
+    if ~run.operatingRegionSatisfied
+        fprintf(fid,'Original certificate region first exited at approximately %.9g s.\n',run.firstRegionExitTime);
+        fprintf(fid,'Continued using the same reachable nonsingular physical robot; no region certificate is claimed.\n');
+    end
 end
-fprintf(fid,'\nAll checks passed. Established frictionless rigid contact and ideal known model only.\n');
+fprintf(fid,'\nAll enabled dynamics, force and equilibrium checks passed; region status is reported above.\n');
+fprintf(fid,'Established frictionless rigid contact and ideal known model only.\n');
 end

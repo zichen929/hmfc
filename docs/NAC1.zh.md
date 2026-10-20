@@ -1,5 +1,7 @@
 # NAC 1：固定不准确法向的 Non-Adaptive Control
 
+[English](NAC1.md) | [简体中文](NAC1.zh.md)
+
 `nac1_simulation.m` 是独立 MATLAB ODE 仿真，不调用 FIC、IAC 或它们的参数文件。控制器采用 FIC 1 的笛卡尔控制律，将真实法向替换为 IAC 1 主工况的初始有效估计法向，并始终固定该估计。
 
 ## 只运行 NAC 1
@@ -10,7 +12,9 @@ results = nac1_simulation(struct('visible','off')); % 保存图像，不显示�
 results = nac1_simulation(struct('makePlots',false,'saveResults',false));
 ```
 
-可设置 `initialAngleDeg`、`initialVelocity`、`duration`、`outputDir`、`makePlots`、`saveResults`、`visible`。`initialAngleDeg` 在此表示整个仿真中固定的估计角度，允许范围为 ±6°；默认 +5°。内部角度使用弧度。默认仿真时长 6 秒，输出间隔 0.002 秒；时长至少为 6 秒，以执行稳态检查。
+可设置 `initialAngleDeg`、`initialVelocity`、`duration`、`outputDir`、`makePlots`、`saveResults`、`visible`、`initialAngleLimitDeg` 和 `enforceOperatingRegion`。`initialAngleDeg` 在此表示整个仿真中固定的估计角度；默认 +5°，默认限制为 ±6°。联合入口会把所选 IAC 扇区半宽传作 `initialAngleLimitDeg`，以便两者使用相同初始角度。内部角度使用弧度。默认仿真时长 6 秒，输出间隔 0.002 秒；时长至少为 6 秒，以执行稳态检查。
+
+`enforceOperatingRegion` 默认 true，离开原认证区域即报错。max angle 的 +15° 对比显式设置为 false，使 NAC 可在同一个精确、可达且非奇异的机器人模型上继续积分；原区域仍逐点检查，越界状态和首次越界采样时间明确保存。该选项不改变机器人模型、控制器或 IAC 的认证区域。
 
 如需运行并比较 FIC 1、NAC 1、IAC 1，请使用另一个入口：
 
@@ -18,7 +22,7 @@ results = nac1_simulation(struct('makePlots',false,'saveResults',false));
 comparison = fic1_nac1_iac1_simulation;
 ```
 
-它会重新运行三个独立实现，输出至 `results/fic1_nac1_iac1/`，不会覆盖单独 NAC 1 的 `results/nac1/`。对比入口的选项和结果布局见 [FIC1_NAC1_IAC1_README.md](FIC1_NAC1_IAC1_README.md)。
+它会重新运行三个独立实现，输出至 `results/fic1_nac1_iac1/`，不会覆盖单独 NAC 1 的 `results/nac1/`。普通与 max angle 对比入口的选项和结果布局见 [FIC1_NAC1_IAC1.zh.md](FIC1_NAC1_IAC1.zh.md)。
 
 ## 与 FIC 1、IAC 1 对齐的主工况
 
@@ -95,3 +99,10 @@ MATLAB R2026a 的静态检查无诊断。默认 +5° 工况下，6 秒结果与�
 三控制器对比图现在由专门的 `fic1_nac1_iac1_simulation` 入口生成，位置为 `results/fic1_nac1_iac1/comparison.png/.fig`。此前临时脚本生成的旧对比图归档在三控制器目录的 `legacy_offline/` 下，单独 NAC 1 的目录只保留自身输出。
 
 数值验证沿用精确模型、理想执行器、无摩擦刚性接触和精确标量力测量的假设；不包含接触建立、碰撞或脱离后的模式切换。
+
+<!-- simulation-figures -->
+## 仿真结果图
+
+**独立 NAC 1：固定 +5° 法向，kf=0 与 kf=2 调节结果**
+
+![独立 NAC 1：固定 +5° 法向，kf=0 与 kf=2 调节结果](figures/nac1/nac1_summary.png)

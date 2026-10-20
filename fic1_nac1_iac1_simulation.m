@@ -2,12 +2,15 @@ function results = fic1_nac1_iac1_simulation(options)
 %FIC1_NAC1_IAC1_SIMULATION Run and compare three independent controllers.
 %   results = fic1_nac1_iac1_simulation;
 %   results = fic1_nac1_iac1_simulation(struct('visible','off'));
+%   Set initialAngleDeg to choose the common NAC/IAC initial estimate.
 %   This entry point executes FIC 1, NAC 1 and IAC 1 afresh, checks their
 %   common conditions, and compares their MAIN regulation cases with kf=0.
 %   For NAC 1 alone, use nac1_simulation. Controllers remain independent.
 %   All outputs go to results/fic1_nac1_iac1/, including per-controller data.
 if nargin==0, options=struct(); end
-defaults=struct('makePlots',true,'visible','on','outputDir', ...
+defaults=struct('makePlots',true,'visible','on','initialAngleDeg',5, ...
+    'sectorHalfWidthDeg',6,'sectorMarginDeg',1e-6, ...
+    'allowNacOutsideOperatingRegion',false,'outputDir', ...
     fullfile(fileparts(mfilename('fullpath')),'results','fic1_nac1_iac1'));
 assert(isstruct(options)&&isscalar(options),'options must be a scalar struct.');
 names=fieldnames(options);
@@ -16,15 +19,19 @@ for k=1:numel(names)
     defaults.(names{k})=options.(names{k});
 end
 options=defaults;
+validateattributes(options.initialAngleDeg,{'numeric'},{'real','finite','scalar'});
 if ~exist(options.outputDir,'dir'), mkdir(options.outputDir); end
 fprintf('\nFIC 1 / NAC 1 / IAC 1: fresh independent simulations\n');
 % Suppress individual figures; this entry point creates comparison figures.
 % Explicit subdirectories preserve the standalone runners' output folders.
-fic=fic1_simulation(false,fullfile(options.outputDir,'fic1'));
-nac=nac1_simulation(struct('makePlots',false,'outputDir', ...
-    fullfile(options.outputDir,'nac1')));
-iac=iac1_simulation(struct('makePlots',false,'outputDir', ...
+iac=iac1_simulation(struct('makePlots',false,'initialAngleDeg',options.initialAngleDeg, ...
+    'sectorHalfWidthDeg',options.sectorHalfWidthDeg,'sectorMarginDeg',options.sectorMarginDeg,'outputDir', ...
     fullfile(options.outputDir,'iac1')));
+fic=fic1_simulation(false,fullfile(options.outputDir,'fic1'));
+nac=nac1_simulation(struct('makePlots',false,'initialAngleDeg',options.initialAngleDeg, ...
+    'initialAngleLimitDeg',iac.certificate.sectorHalfWidthUsedDeg, ...
+    'enforceOperatingRegion',~options.allowNacOutsideOperatingRegion,'outputDir', ...
+    fullfile(options.outputDir,'nac1')));
 checks=check_conditions(fic,nac,iac);
 a=fic.cases(1); b=nac.cases(1); d=iac.runs(1);
 trueAngle=atan2(-iac.plant.n(1),iac.plant.n(2));
@@ -37,12 +44,14 @@ primary(3)=struct('name','IAC 1','t',d.t,'x',d.y(:,1), ...
     'error',d.error,'force',d.force,'angle',d.barTheta,'tau',d.tau);
 fd=fic.config.fd;
 metrics=repmat(struct('finalMotionError_m',0,'finalForce_N',0, ...
-    'finalForceError_N',0,'minForce_N',0,'finalAngleError_deg',0),1,numel(primary));
+    'finalForceError_N',0,'minForce_N',0,'finalAngleError_deg',0, ...
+    'stayedInOperatingRegion',true),1,numel(primary));
 for k=1:numel(primary)
     r=primary(k);
     metrics(k)=struct('finalMotionError_m',r.error(end), ...
         'finalForce_N',r.force(end),'finalForceError_N',r.force(end)-fd, ...
-        'minForce_N',min(r.force),'finalAngleError_deg',(r.angle(end)-trueAngle)*180/pi);
+        'minForce_N',min(r.force),'finalAngleError_deg',(r.angle(end)-trueAngle)*180/pi, ...
+        'stayedInOperatingRegion',k~=2 || b.operatingRegionSatisfied);
     signals=table(r.t,r.x,r.error,r.force,r.angle,r.tau(:,1),r.tau(:,2), ...
         'VariableNames',{'time_s','x_t_m','motion_error_m','force_N', ...
         'normal_angle_rad','tau1_Nm','tau2_Nm'});
@@ -52,7 +61,8 @@ end
 summary=struct2table(metrics);
 summary=addvars(summary,string({primary.name})','Before',1,'NewVariableNames','controller');
 results=struct('options',options,'fic1',fic,'nac1',nac,'iac1',iac, ...
-    'primary',primary,'summary',summary,'checks',checks,'allChecksPassed',true);
+    'primary',primary,'summary',summary,'checks',checks,'allChecksPassed',true, ...
+    'allStayedInOperatingRegion',b.operatingRegionSatisfied);
 writetable(summary,fullfile(options.outputDir,'summary.csv'));
 save(fullfile(options.outputDir,'fic1_nac1_iac1_results.mat'),'results');
 write_report(results);
@@ -99,6 +109,7 @@ assert(checks.initialNacIacTorqueDifference<1e-10 && checks.initialNacIacForceDi
 checks.identicalPhysicalConditions=true;
 checks.identicalReferenceAndOutputTimes=true;
 checks.identicalInitialNacIacNormal=true;
+checks.nacStayedInOperatingRegion=b.operatingRegionSatisfied;
 checks.passed=true;
 end
 
@@ -113,6 +124,9 @@ nexttile; plot(t,[r.x],'LineWidth',1.4); hold on;
 yline(results.nac1.task.targetX,'k:'); grid on;
 xlabel('Time (s)'); ylabel('x_t (m)'); title('Same regulation task');
 legend('FIC 1','NAC 1','IAC 1','Desired');
+if ~results.allStayedInOperatingRegion
+    yline(results.nac1.plant.xMax,'r--','Certificate-region upper limit','HandleVisibility','off');
+end
 nexttile; plot(t,1000*[r.error],'LineWidth',1.4); grid on;
 xlabel('Time (s)'); ylabel('Position error (mm)'); title('Motion error');
 legend('FIC 1','NAC 1','IAC 1');
@@ -123,7 +137,12 @@ legend('FIC 1','NAC 1','IAC 1','Desired');
 nexttile; plot(t,[r.angle]*180/pi,'LineWidth',1.4); grid on;
 xlabel('Time (s)'); ylabel('Normal angle (deg)'); title('True, fixed and adaptive normal');
 legend('FIC 1: true','NAC 1: fixed','IAC 1: effective');
-sgtitle('FIC 1 / NAC 1 / IAC 1 | identical physical conditions | k_f=0');
+titleText=sprintf('FIC 1 / NAC 1 / IAC 1 | k_f=0 | initial NAC/IAC angle %+.1f deg',o.initialAngleDeg);
+if ~results.allStayedInOperatingRegion
+    titleText=sprintf('%s\nIAC sector +/-%.6f deg | NAC leaves the original certificate region', ...
+        titleText,results.iac1.certificate.sectorHalfWidthUsedDeg);
+end
+sgtitle(titleText);
 exportgraphics(fig,fullfile(o.outputDir,'comparison.png'),'Resolution',180);
 savefig(fig,fullfile(o.outputDir,'comparison.fig'));
 end
@@ -135,11 +154,20 @@ fprintf(fid,'FIC 1 / NAC 1 / IAC 1 comparison, freshly integrated independent im
 fprintf(fid,'Main regulation case only: horizontal surface, target displacement 0.08 m, kf=0.\n');
 fprintf(fid,'Matched robot, geometry, initial states, gains, reference, operating domain and output times.\n');
 fprintf(fid,'NAC 1 and IAC 1 share the same initial normal estimate.\n');
+fprintf(fid,'Initial NAC/IAC normal angle: %+.12g deg\n',results.options.initialAngleDeg);
+fprintf(fid,'IAC sector half-width: %.12g deg; open supremum: %.12g deg\n', ...
+    results.iac1.certificate.sectorHalfWidthUsedDeg,results.iac1.certificate.sectorHalfWidthSupremumDeg);
 fprintf(fid,'Initial NAC/IAC torque difference: %.12g N m\n',results.checks.initialNacIacTorqueDifference);
 fprintf(fid,'Initial NAC/IAC force difference: %.12g N\n',results.checks.initialNacIacForceDifference);
 for k=1:numel(results.primary)
     r=results.primary(k);
     fprintf(fid,'%s: final motion error %.12g m, final force %.12g N\n',r.name,r.error(end),r.force(end));
 end
-fprintf(fid,'All constituent checks and comparison condition checks passed.\n');
+fprintf(fid,'All dynamics checks and comparison condition checks passed.\n');
+if ~results.allStayedInOperatingRegion
+    fprintf(fid,'NAC 1 left the ORIGINAL certificate region at approximately %.9g s.\n', ...
+        results.nac1.cases(1).firstRegionExitTime);
+    fprintf(fid,'Its exact physical model was continued in reachable nonsingular configurations.\n');
+    fprintf(fid,'NAC 1 is not certified to stay in that region. FIC 1 and IAC 1 remained inside.\n');
+end
 end
