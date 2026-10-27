@@ -4,7 +4,18 @@
 
 This project uses a two-link robot in a vertical plane with frictionless rigid contact to numerically verify full-information control (FIC), non-adaptive control with a fixed inaccurate normal (NAC), and immersion and invariance (I&I) adaptive control (IAC). It compares motion errors, contact forces, normal estimates, and joint torques, and checks the implementations against constrained dynamics and theoretical identities.
 
-Only base MATLAB is required. The project has been verified in **MATLAB R2026a**. Simulink, Robotics Toolbox, and Optimization Toolbox are not required. The theoretical source is `obsidian-vault/04-writing/tcst26/TCST26E3.md` in the neighboring Obsidian repository; that repository is not a runtime dependency.
+The ODE simulations require only base MATLAB and have been verified in **MATLAB R2026a**. The optional native physical FIC1 model additionally requires **Simulink, Simscape, and Simscape Multibody**. The theoretical source is `obsidian-vault/04-writing/tcst26/TCST26E3.md` in the neighboring Obsidian repository; that repository is not a runtime dependency.
+
+## Native Simscape Multibody FIC1
+
+```matlab
+open_system('hmfc_fic1_simscape.slx');  % Ready-to-run physical arm and controller
+physical = fic1_simscape_simulation;   % Four cases, ODE comparison, plots and checks
+% Rebuild the SLX from readable source if needed:
+build_hmfc_simscape;
+```
+
+The physical plant contains two rigid links, torque-driven revolute joints, gravity, and an ideal frictionless pin-slot constraint at the endpoint. Its mass, centers of mass, and planar inertia match the ODE model exactly. Joint motion and contact reaction are solved by Multibody. The constraint represents the maintained-contact branch; a positive-reaction assertion checks its admissibility. See [model construction, controller, solver and validation](docs/FIC1_SIMSCAPE.md).
 
 ## Quick start
 

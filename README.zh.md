@@ -4,7 +4,18 @@
 
 本工程使用竖直平面两连杆机器人和无摩擦刚性接触模型，数值验证全信息控制（FIC）、固定不准确法向的非自适应控制（NAC）和 I&I 自适应控制（IAC）。主要比较运动误差、接触力、法向估计和关节力矩，并通过约束动力学和理论关系检查实现。
 
-只需基础 MATLAB，已在 **MATLAB R2026a** 验证。无需 Simulink、Robotics Toolbox 或 Optimization Toolbox。理论来源为同级 Obsidian 仓库中的 `obsidian-vault/04-writing/tcst26/TCST26E3.md`；运行仿真不依赖该笔记仓库。
+原 ODE 仿真只需基础 MATLAB，已在 **MATLAB R2026a** 验证。新增的原生物理 FIC1 模型需要 **Simulink、Simscape 和 Simscape Multibody**。理论来源为同级 Obsidian 仓库中的 `obsidian-vault/04-writing/tcst26/TCST26E3.md`；运行仿真不依赖该笔记仓库。
+
+## 原生 Simscape Multibody FIC1
+
+```matlab
+open_system('hmfc_fic1_simscape.slx');  % 可直接运行的物理机械臂与控制器
+physical = fic1_simscape_simulation;   % 四种工况、ODE 对照、结果图与验证
+% 需要时从可读源代码重新生成 SLX：
+build_hmfc_simscape;
+```
+
+物理机械臂包含两根刚体、力矩驱动的转动关节、重力和末端理想无摩擦滑动约束。质量、质心及平面转动惯量与原 ODE 模型相同，由 Multibody 求解关节运动和约束反力。约束表示接触已建立的分支，并通过正反力断言检查其物理可行性。详见[模型构建、控制律、求解器与验证说明](docs/FIC1_SIMSCAPE.zh.md)。
 
 ## 快速开始
 
