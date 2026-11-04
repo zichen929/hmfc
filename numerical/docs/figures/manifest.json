@@ -1,0 +1,277 @@
+{
+  "figures": [
+    {
+      "source": "numerical/results/fic1/regulation.png",
+      "snapshot": "numerical/docs/figures/fic1/regulation.png",
+      "sha256": "954857e39a3874a218be8fbb3875364a9a9b7e5b68b6dcc7377cd9eef7aa6e81",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic1/tracking.png",
+      "snapshot": "numerical/docs/figures/fic1/tracking.png",
+      "sha256": "14fba3477ce77ef500cd4208387c6abc40ff797770e4f914c2a0175334374aec",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic1/diagnostics.png",
+      "snapshot": "numerical/docs/figures/fic1/diagnostics.png",
+      "sha256": "cea7de94b42067bee6166a4328f3e03d30b7303863d314f423549726a8e052da",
+      "width": 1902,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic2/regulation.png",
+      "snapshot": "numerical/docs/figures/fic2/regulation.png",
+      "sha256": "815bbc03ec29227b48fca2ed4ebe2a1dd262c19ecf15338c012b8a99341a97c4",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic2/tracking.png",
+      "snapshot": "numerical/docs/figures/fic2/tracking.png",
+      "sha256": "689519a9d61f29658f668bbd123fb7c383972c45210fa99bdab14ef010d3f66f",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic2/diagnostics.png",
+      "snapshot": "numerical/docs/figures/fic2/diagnostics.png",
+      "sha256": "ca9bd0be7617a91369a3d58978e3612a3d5d325524fcf277b0bcd87c82ed01be",
+      "width": 1902,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic3/regulation.png",
+      "snapshot": "numerical/docs/figures/fic3/regulation.png",
+      "sha256": "d2db448c46f1be1d2e2547b88322a2e61190d31a1c8c214fdbb48abd31cdc1d0",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic3/tracking.png",
+      "snapshot": "numerical/docs/figures/fic3/tracking.png",
+      "sha256": "8de1534679e9a36fac55a9cf3b4bcf09f54c44c04a736e8e30de55182a133f73",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic3/diagnostics.png",
+      "snapshot": "numerical/docs/figures/fic3/diagnostics.png",
+      "sha256": "3223faaa7168d91eb6e77a66238e9318e690f651ded0e6167528908a41c05774",
+      "width": 1902,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic4/regulation.png",
+      "snapshot": "numerical/docs/figures/fic4/regulation.png",
+      "sha256": "6f2bac0dfe65b167af515377230403aaccbbe41b04b8601db9f3d3d5022017d3",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic4/tracking.png",
+      "snapshot": "numerical/docs/figures/fic4/tracking.png",
+      "sha256": "5a583f30e30c83beb82c1ea328e9b1cbe8baf29960fe69977a202c803b73fd75",
+      "width": 1939,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic4/diagnostics.png",
+      "snapshot": "numerical/docs/figures/fic4/diagnostics.png",
+      "sha256": "923534c8512bde83d6b905d5b3b28b023ba0f52efa9abc9fc5cd8223a2fd8420",
+      "width": 1902,
+      "height": 1478
+    },
+    {
+      "source": "numerical/results/fic12/comparison/regulation_kf_0.png",
+      "snapshot": "numerical/docs/figures/fic12/comparison/regulation_kf_0.png",
+      "sha256": "807f58327dec6ce8ce1491e3f69903a64032e3de741aa968b105240765d4ceca",
+      "width": 1987,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic12/comparison/regulation_kf_2.png",
+      "snapshot": "numerical/docs/figures/fic12/comparison/regulation_kf_2.png",
+      "sha256": "06c99759ce94d80c65e8a8f371e365cd00392e7e6ef1778450a8f813f03c9a0c",
+      "width": 1987,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic12/comparison/tracking_kf_0.png",
+      "snapshot": "numerical/docs/figures/fic12/comparison/tracking_kf_0.png",
+      "sha256": "574ec016405433a371c03cbfa93aaa82afdeb122252576dca839faafa5e5147b",
+      "width": 1987,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic12/comparison/tracking_kf_2.png",
+      "snapshot": "numerical/docs/figures/fic12/comparison/tracking_kf_2.png",
+      "sha256": "efe5797e9a0a55dbdaf781b1e79f092a10d0d053033d949ab3ad08cf877bb3c4",
+      "width": 1987,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic12/comparison/equivalence.png",
+      "snapshot": "numerical/docs/figures/fic12/comparison/equivalence.png",
+      "sha256": "aad21c2d34cace799083464dc7e9e0a17f0fa28c3a409e9fe1f1298af06acbab",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic123/comparison/regulation_kf_0.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/regulation_kf_0.png",
+      "sha256": "3a2b742f797623d2de4faef83048cad7df96cb2ad95550dedb228bbe4efd99b9",
+      "width": 3037,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic123/comparison/regulation_kf_2.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/regulation_kf_2.png",
+      "sha256": "acc44d09d239870d01ed8139ae5479e625b9e4b74fbe36347cf57e06eb173a9e",
+      "width": 3037,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic123/comparison/tracking_kf_0.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/tracking_kf_0.png",
+      "sha256": "dd3324b491fba01257db4dc710d9c0f0707137ad063e62f10ebb3a37028a8df2",
+      "width": 3037,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic123/comparison/tracking_kf_2.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/tracking_kf_2.png",
+      "sha256": "aa080a5ea80a2905289c59d70308a1e89eaf886feb0e5540d0bc84302d8f69e5",
+      "width": 3037,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic123/comparison/equivalence_1_2.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/equivalence_1_2.png",
+      "sha256": "f6439115adc05c7eac5092aab6d5add337486d1557c4bc9101cce6bdc52698bc",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic123/comparison/equivalence_1_3.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/equivalence_1_3.png",
+      "sha256": "9fe0f041119488c15adfd0deec65fe230b1e1a56c900fa51bb41ad916da6a343",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic123/comparison/equivalence_2_3.png",
+      "snapshot": "numerical/docs/figures/fic123/comparison/equivalence_2_3.png",
+      "sha256": "c26b778abdcc2c83efd04f1cd2d3f342f148decf1d278f34c98a27aaad1ab851",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/regulation_kf_0.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/regulation_kf_0.png",
+      "sha256": "0222b0ca71e1b46093c46672e2041d8a1fc37d51f9a28fc7d78cfb7850fef299",
+      "width": 4104,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/regulation_kf_2.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/regulation_kf_2.png",
+      "sha256": "2192e3bf152e7a83922b75a4e3e583ebc010173c8d4ee03357af24aa1d2f774c",
+      "width": 4104,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/tracking_kf_0.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/tracking_kf_0.png",
+      "sha256": "1063e62043acdbb84f2d1b41a2212cfaa17474a37c34e619d4174f08d4fedf2c",
+      "width": 4104,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/tracking_kf_2.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/tracking_kf_2.png",
+      "sha256": "7abe6f85b26ca2f8b01134cc22252cd55ad78db921b3c3b490067573081e704e",
+      "width": 4104,
+      "height": 1800
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/equivalence_1_2.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/equivalence_1_2.png",
+      "sha256": "2f4b62363828427062c11ae2670d39cf8743a8da3bafa5f3e078f4126f955a87",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/equivalence_1_3.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/equivalence_1_3.png",
+      "sha256": "9a5d9dc76c89e8b93c45169cebc48e5f0e0d4526b9a3cb8f844fcea15ffc2e6f",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/equivalence_1_4.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/equivalence_1_4.png",
+      "sha256": "44081c9a35c877be739ecce2defaa4a776f12649bcd3f0c40bb0fdc2e4be816f",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/equivalence_2_3.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/equivalence_2_3.png",
+      "sha256": "931e780742a6de29528848a0f2d233e413adab986021e2f1482e0f894573290b",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/equivalence_2_4.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/equivalence_2_4.png",
+      "sha256": "d4ed3116092593568663d9f55a0b780c1d5f08ed4012ecea9009e059758f9c05",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/fic1234/comparison/equivalence_3_4.png",
+      "snapshot": "numerical/docs/figures/fic1234/comparison/equivalence_3_4.png",
+      "sha256": "cd6ccf7dad765a87653d7362c3fa170adfe4fd7d34d5294c13489ac5646b28b7",
+      "width": 1902,
+      "height": 1396
+    },
+    {
+      "source": "numerical/results/nac1/nac1_summary.png",
+      "snapshot": "numerical/docs/figures/nac1/nac1_summary.png",
+      "sha256": "56e96700f48da840e6d40a853138e8159510c6a2063986d6d9565bd71cd376d1",
+      "width": 1892,
+      "height": 1379
+    },
+    {
+      "source": "numerical/results/iac1/iac1_summary.png",
+      "snapshot": "numerical/docs/figures/iac1/iac1_summary.png",
+      "sha256": "8cf06d84cb8d3002fd038d8a977bdac6088220911ad37b7e8cc89d81d402c31d",
+      "width": 1879,
+      "height": 1379
+    },
+    {
+      "source": "numerical/results/fic1_nac1_iac1/comparison.png",
+      "snapshot": "numerical/docs/figures/fic1_nac1_iac1/comparison.png",
+      "sha256": "35b1d89bc98b05d7019f551b120fe38505e0d7a32ad758ad31ef4fd32987baf0",
+      "width": 1723,
+      "height": 1296
+    },
+    {
+      "source": "numerical/results/fic1_nac1_iac1_max_angle/comparison.png",
+      "snapshot": "numerical/docs/figures/fic1_nac1_iac1_max_angle/comparison.png",
+      "sha256": "bf8d879bb5a0e164fea4beb7eb49588c70ad2a0ec357ffe218f3ec9be856dfea",
+      "width": 1723,
+      "height": 1297
+    },
+    {
+      "source": "numerical/results/fic1_nac1_iac1_max_angle_6deg/comparison.png",
+      "snapshot": "numerical/docs/figures/fic1_nac1_iac1_max_angle_6deg/comparison.png",
+      "sha256": "b6a87ef5aa9f8bc1962962091a1f3d7de004d9b3081afe951b8957a843d181c7",
+      "width": 1723,
+      "height": 1296
+    }
+  ]
+}

@@ -1,1 +1,8 @@
 results/
+slprj/
+*.slxc
+*.autosave
+numerical/results/
+simscape/results/
+simscape/cache/
+simscape/codegen/

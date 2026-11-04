@@ -1,0 +1,1000 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project MetadataType="monolithic">
+    <Categories Location="Root">
+        <Category Location="FileClassCategory">
+            <Info DataType="None" Name="Classification" ReadOnly="1" SingleValued="1" />
+            <Label Location="artifact">
+                <Info Name="Artifact" ReadOnly="READ_ONLY" />
+            </Label>
+            <Label Location="convenience">
+                <Info Name="Convenience" ReadOnly="READ_ONLY" />
+            </Label>
+            <Label Location="derived">
+                <Info Name="Derived" ReadOnly="READ_ONLY" />
+            </Label>
+            <Label Location="design">
+                <Info Name="Design" ReadOnly="READ_ONLY" />
+            </Label>
+            <Label Location="none">
+                <Info Name="None" ReadOnly="READ_ONLY" />
+            </Label>
+            <Label Location="other">
+                <Info Name="Other" ReadOnly="READ_ONLY" />
+            </Label>
+            <Label Location="test">
+                <Info Name="Test" ReadOnly="READ_ONLY" />
+            </Label>
+        </Category>
+    </Categories>
+    <EntryPoints Location="Root">
+        <EntryPoint Location="a6ce764a-557d-446b-9b11-421d0bd3538e">
+            <Info File="setup_project.m" GroupUUID="default" Icon="" Name="setup_project" Type="StartUp" Visible="0" />
+        </EntryPoint>
+        <EntryPoint Location="2fa49112-1a82-435b-b7a7-5a47bba0654c">
+            <Info File="numerical/fic1_nac1_iac1_simulation.m" GroupUUID="bdc9b48c-b69c-4b06-89ac-b9bc50d2beb5" Icon="" Name="Compare FIC, NAC1 and IAC1" Type="Basic" Visible="1" />
+        </EntryPoint>
+        <EntryPoint Location="09624238-6f24-4757-b3a9-f0999ca39588">
+            <Info File="numerical/fic1_nac1_iac1_max_angle_simulation.m" GroupUUID="bdc9b48c-b69c-4b06-89ac-b9bc50d2beb5" Icon="" Name="Compare maximum initial angle" Type="Basic" Visible="1" />
+        </EntryPoint>
+        <EntryPoint Location="a3590cdc-04d3-44c2-b902-343df4273aaf">
+            <Info File="numerical/run_numerical_tests.m" GroupUUID="1e5bd0a4-4cff-41ac-89a9-d45629f8cff6" Icon="" Name="Run numerical tests" Type="Basic" Visible="1" />
+        </EntryPoint>
+        <EntryPoint Location="fea6cfc6-fd4b-4daa-9bfa-6602049b3a37">
+            <Info File="simscape/fic1_simscape_simulation.m" GroupUUID="5d43b976-067b-496d-8824-e63609714d7a" Icon="" Name="Run physical FIC1 comparison" Type="Basic" Visible="1" />
+        </EntryPoint>
+        <EntryPoint Location="e466181e-1633-43c5-8481-5bb28befead7">
+            <Info File="simscape/hmfc_fic1_simscape.slx" GroupUUID="5d43b976-067b-496d-8824-e63609714d7a" Icon="" Name="Open physical FIC1 model" Type="Basic" Visible="1" />
+        </EntryPoint>
+        <EntryPoint Location="2a01371b-5ed1-4ef8-ad1f-f2a44788adc4">
+            <Info File="simscape/run_simscape_tests.m" GroupUUID="1e5bd0a4-4cff-41ac-89a9-d45629f8cff6" Icon="" Name="Run Simscape tests" Type="Basic" Visible="1" />
+        </EntryPoint>
+    </EntryPoints>
+    <Files Location="Root">
+        <File Location=".gitattributes">
+            <Info>
+                <Category UUID="FileClassCategory">
+                    <Label UUID="other" />
+                </Category>
+            </Info>
+        </File>
+        <File Location=".gitignore">
+            <Info>
+                <Category UUID="FileClassCategory">
+                    <Label UUID="other" />
+                </Category>
+            </Info>
+        </File>
+        <File Location="README.md">
+            <Info>
+                <Category UUID="FileClassCategory">
+                    <Label UUID="artifact" />
+                </Category>
+            </Info>
+        </File>
+        <File Location="hmfc.prj">
+            <Info>
+                <Category UUID="FileClassCategory">
+                    <Label UUID="other" />
+                </Category>
+            </Info>
+        </File>
+        <File Location="setup_project.m">
+            <Info>
+                <Category UUID="FileClassCategory">
+                    <Label UUID="design" />
+                </Category>
+            </Info>
+        </File>
+        <File Location="numerical">
+            <Info />
+            <DIR_SIGNIFIER Location="1">
+                <Info />
+            </DIR_SIGNIFIER>
+            <File Location="README.md">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="artifact" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="docs">
+                <Info />
+                <DIR_SIGNIFIER Location="1">
+                    <Info />
+                </DIR_SIGNIFIER>
+                <File Location="FIC.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="FIC1_NAC1_IAC1.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="IAC1.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="NAC1.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="NUMERICAL_API.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="wam7-exp-guide.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="figures">
+                    <Info />
+                    <DIR_SIGNIFIER Location="1">
+                        <Info />
+                    </DIR_SIGNIFIER>
+                    <File Location="fic1">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="diagnostics.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="regulation.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="tracking.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="fic12">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="comparison">
+                            <Info />
+                            <DIR_SIGNIFIER Location="1">
+                                <Info />
+                            </DIR_SIGNIFIER>
+                            <File Location="equivalence.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="regulation_kf_0.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="regulation_kf_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="tracking_kf_0.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="tracking_kf_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                        </File>
+                    </File>
+                    <File Location="fic123">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="comparison">
+                            <Info />
+                            <DIR_SIGNIFIER Location="1">
+                                <Info />
+                            </DIR_SIGNIFIER>
+                            <File Location="equivalence_1_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_1_3.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_2_3.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="regulation_kf_0.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="regulation_kf_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="tracking_kf_0.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="tracking_kf_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                        </File>
+                    </File>
+                    <File Location="fic1234">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="comparison">
+                            <Info />
+                            <DIR_SIGNIFIER Location="1">
+                                <Info />
+                            </DIR_SIGNIFIER>
+                            <File Location="equivalence_1_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_1_3.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_1_4.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_2_3.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_2_4.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="equivalence_3_4.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="regulation_kf_0.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="regulation_kf_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="tracking_kf_0.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                            <File Location="tracking_kf_2.png">
+                                <Info>
+                                    <Category UUID="FileClassCategory">
+                                        <Label UUID="artifact" />
+                                    </Category>
+                                </Info>
+                            </File>
+                        </File>
+                    </File>
+                    <File Location="fic1_nac1_iac1">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="comparison.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="fic1_nac1_iac1_max_angle">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="comparison.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="fic1_nac1_iac1_max_angle_6deg">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="comparison.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="fic2">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="diagnostics.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="regulation.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="tracking.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="fic3">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="diagnostics.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="regulation.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="tracking.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="fic4">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="diagnostics.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="regulation.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="tracking.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="iac1">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="iac1_summary.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                    <File Location="manifest.json">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="nac1">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="nac1_summary.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                </File>
+                <File Location="zh-cn">
+                    <Info />
+                    <DIR_SIGNIFIER Location="1">
+                        <Info />
+                    </DIR_SIGNIFIER>
+                    <File Location="FIC.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="FIC1_NAC1_IAC1.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="IAC1.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="NAC1.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="NUMERICAL_API.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="wam7-exp-guide.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="README.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                </File>
+            </File>
+            <File Location="fic1_nac1_iac1_max_angle_simulation.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="fic1_nac1_iac1_simulation.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="fic_simulation.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="iac1_simulation.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="nac1_simulation.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="run_numerical_tests.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="setup_numerical.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="shared">
+                <Info />
+                <DIR_SIGNIFIER Location="1">
+                    <Info />
+                </DIR_SIGNIFIER>
+                <File Location="hmfc_append_runs.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_forward_kinematics.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_inverse_kinematics.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_jacobian.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_latex_figure.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_numerical_root.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_parameter_groups.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_parameters.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_project_root.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_robot_model.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_robot_state.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_run_metrics.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_run_region.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_run_signals.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_run_summary.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="hmfc_simulation_options.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="design" />
+                        </Category>
+                    </Info>
+                </File>
+            </File>
+            <File Location="tests">
+                <Info />
+                <DIR_SIGNIFIER Location="1">
+                    <Info />
+                </DIR_SIGNIFIER>
+                <File Location="test_fic_simulation.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="test" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="test_numerical_interface.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="test" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="test_project_setup.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="test" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="test_robot_model.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="test" />
+                        </Category>
+                    </Info>
+                </File>
+            </File>
+        </File>
+        <File Location="simscape">
+            <Info />
+            <DIR_SIGNIFIER Location="1">
+                <Info />
+            </DIR_SIGNIFIER>
+            <File Location="README.md">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="artifact" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="build_hmfc_simscape.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="docs">
+                <Info />
+                <DIR_SIGNIFIER Location="1">
+                    <Info />
+                </DIR_SIGNIFIER>
+                <File Location="FIC1_SIMSCAPE.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+                <File Location="figures">
+                    <Info />
+                    <DIR_SIGNIFIER Location="1">
+                        <Info />
+                    </DIR_SIGNIFIER>
+                    <File Location="fic1_simscape">
+                        <Info />
+                        <DIR_SIGNIFIER Location="1">
+                            <Info />
+                        </DIR_SIGNIFIER>
+                        <File Location="model_overview.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="physical_plant.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="regulation.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                        <File Location="tracking.png">
+                            <Info>
+                                <Category UUID="FileClassCategory">
+                                    <Label UUID="artifact" />
+                                </Category>
+                            </Info>
+                        </File>
+                    </File>
+                </File>
+                <File Location="zh-cn">
+                    <Info />
+                    <DIR_SIGNIFIER Location="1">
+                        <Info />
+                    </DIR_SIGNIFIER>
+                    <File Location="FIC1_SIMSCAPE.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                    <File Location="README.md">
+                        <Info>
+                            <Category UUID="FileClassCategory">
+                                <Label UUID="artifact" />
+                            </Category>
+                        </Info>
+                    </File>
+                </File>
+            </File>
+            <File Location="fic1_simscape_controller.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="fic1_simscape_simulation.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="hmfc_fic1_simscape.slx">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="hmfc_simscape_root.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="plot_fic1_simscape_results.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="run_simscape_tests.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="setup_simscape.m">
+                <Info>
+                    <Category UUID="FileClassCategory">
+                        <Label UUID="design" />
+                    </Category>
+                </Info>
+            </File>
+            <File Location="tests">
+                <Info />
+                <DIR_SIGNIFIER Location="1">
+                    <Info />
+                </DIR_SIGNIFIER>
+                <File Location="test_simscape_project.m">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="test" />
+                        </Category>
+                    </Info>
+                </File>
+            </File>
+        </File>
+        <File Location="docs">
+            <Info />
+            <DIR_SIGNIFIER Location="1">
+                <Info />
+            </DIR_SIGNIFIER>
+            <File Location="zh-cn">
+                <Info />
+                <DIR_SIGNIFIER Location="1">
+                    <Info />
+                </DIR_SIGNIFIER>
+                <File Location="README.md">
+                    <Info>
+                        <Category UUID="FileClassCategory">
+                            <Label UUID="artifact" />
+                        </Category>
+                    </Info>
+                </File>
+            </File>
+        </File>
+    </Files>
+    <Info Location="ProjectData">
+        <Info Name="HMFC" />
+    </Info>
+    <ProjectPath Location="Root">
+        <Reference Location="d913f7d6-cf7e-43b0-8629-37179e13fa55">
+            <Info Ref="" Type="Relative" />
+        </Reference>
+        <Reference Location="f16fa79c-9865-427f-91ae-4817f1b84bec">
+            <Info Ref="numerical" Type="Relative" />
+        </Reference>
+        <Reference Location="2c61dd86-584f-415c-b7a2-ed79ed0b3f0d">
+            <Info Ref="numerical/shared" Type="Relative" />
+        </Reference>
+        <Reference Location="dc356a40-a667-4caf-bcb0-f3a9a4c0bf45">
+            <Info Ref="simscape" Type="Relative" />
+        </Reference>
+    </ProjectPath>
+    <Root Location="Extensions">
+        <Extension Location="Information">
+            <Info description="HMFC numerical and Simscape simulations, each with its own documentation, tests and generated outputs." />
+        </Extension>
+    </Root>
+    <WorkingFolders Location="Root">
+        <Reference Location="ProjectStartupFolder">
+            <Info Ref="." Type="Relative" />
+        </Reference>
+        <Reference Location="SimulinkCacheFolder">
+            <Info Ref="simscape/cache" Type="Relative" />
+        </Reference>
+        <Reference Location="SimulinkCodeGenFolder">
+            <Info Ref="simscape/codegen" Type="Relative" />
+        </Reference>
+    </WorkingFolders>
+    <EntryPointGroups Location="Root">
+        <EntryPointGroup Location="bdc9b48c-b69c-4b06-89ac-b9bc50d2beb5">
+            <Info Name="Numerical" />
+        </EntryPointGroup>
+        <EntryPointGroup Location="1e5bd0a4-4cff-41ac-89a9-d45629f8cff6">
+            <Info Name="Tests" />
+        </EntryPointGroup>
+        <EntryPointGroup Location="5d43b976-067b-496d-8824-e63609714d7a">
+            <Info Name="Simscape" />
+        </EntryPointGroup>
+    </EntryPointGroups>
+</project>
