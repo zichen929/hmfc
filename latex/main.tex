@@ -1,0 +1,1244 @@
+% !TeX program = latexmk
+\documentclass[10pt,journal,letterpaper]{IEEEtran}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Immersion and Invariance Adaptive Motion-Force Control With an Unknown Planar Contact Surface}}
+\newtheorem{theorem}{Theorem}
+\hyphenation{ma-nip-u-la-tor ma-nip-u-la-tors}
+
+\begin{document}
+\title{Immersion and Invariance Adaptive Motion--Force Control With an Unknown Planar Contact Surface}
+\author{}
+\maketitle
+
+\begin{abstract}
+This paper studies motion and force control of a two-degree-of-freedom robot manipulator in frictionless rigid unilateral contact with a fixed line of unknown orientation. The robot kinematics and dynamics are known, and joint position, joint velocity, and the scalar normal contact force are measured exactly. A full-information task-space controller first defines the target motion and force dynamics. An immersion and invariance adaptive controller then replaces the unknown surface normal with an effective angle estimate corrected by measurable Cartesian momentum. The resulting implementation requires neither acceleration measurements nor numerical differentiation of the contact force. A sufficient angular-sector condition, expressed using uniform Cartesian inertia bounds, guarantees a strictly positive compressive reaction and prevents contact loss from an initially established contact state. Within this sector, the effective angle estimate converges exponentially without persistence of excitation of the tangential motion. The motion and force errors also converge exponentially, and the adaptive closed loop realizes the full-information target on an invariant parameter manifold. These results are conditional on confinement to a smooth nonsingular robot operating region. Regulation follows as the constant-reference case of the tracking construction.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Adaptive control, immersion and invariance, motion--force control, robot manipulators, unilateral contact.
+\end{IEEEkeywords}
+
+\section{Problem Setting}
+In many robotic contact manipulation tasks, the objective is to move the end-effector on a surface and apply a contact force. Typical examples include inspection, polishing, and grinding operations \cite{DycSacKlo22,TzoGraYan20,NagHasHag07}. Hybrid force-motion control (HFMC) is well-suited for applications that require accurate simultaneous tracking of motion and force trajectories \cite{RaiCra81}. In the rigid-contact case, HFMC is commonly formulated as a constrained motion control problem using differential-algebraic equations. This yields a rigorous framework which decouples force and motion subspaces. This paper focuses on an adaptive HFMC problem. In particular, we consider force-motion control for a two-degree-of-freedom (DoF) robot, and account for uncertainty in planar surface geometry, {i.e.},\ an unknown surface normal. In this case, the coordinates traditionally used for decoupling are unknown, complicating the HFMC approach \cite{McCWan88}.
+
+A number of papers have proposed adaptive HFMC schemes to account for uncertainty in constraint geometry \cite{NamAgh05,KarDou09,PliArt15,CheSlo10}. These papers model geometric uncertainty in different ways: in the Jacobian matrix \cite{NamAgh05}, normal vector \cite{KarDou09}, and surface parameters \cite{PliArt15}. Work in \cite{CheSlo10} adds visual measurements to adaptive HFMC and considers uncertainty in kinematics and camera models. These methods typically select a Lyapunov function $V$ for the closed-loop and design an adaptation law to cancel uncertainty-dependent cross terms in $\dot{V}$, thereby making the derivative negative definite and establishing closed-loop stability. However, such cancellation can be sensitive to measurement noise or modeling error.
+
+Adaptive extensions of immersion and invariance (I\&I) theory~\cite{AstOrt03} have been developed in several forms and applied successfully to fixed-base manipulator and aerial robotics~\cite{KarAst08,SeoAke09,astolfi2008nonlinear,HuZha13,FujYokTan10,ZhaXiaZha15}. In adaptive I\&I control, one first specifies an asymptotically stable target system evolving on a lower-dimensional invariant manifold, and then constructs the actual closed-loop by replacing unknown parameters in a nominal non-adaptive control law with their estimates. The off-manifold coordinate, which measures the distance of the closed-loop trajectories from this manifold, is tied to the parameter estimation error. A suitably designed adaptation law renders the manifold attractive, so that the closed-loop trajectories converge to the manifold and asymptotically coincide with the target dynamics. This design procedure requires neither a preselected Lyapunov function for the closed-loop system nor relies on fragile exact cancellation to establish stability~\cite{AstOrtVen10,ThaSriAke15}.
+
+Consider a robot manipulator moving in a vertical plane while maintaining frictionless rigid unilateral contact with a fixed straight line. The control objective is to follow a prescribed feasible motion reference along that line and regulate a positive constant normal contact force. The robot model is known, whereas the contact-line orientation is unknown in the adaptive design. Analysis begins with contact already established and zero normal velocity. Contact establishment, impacts, and contact-mode transitions are outside the model.
+
+The development proceeds from the robot and contact model to the full-information task-space controller, denoted FIC 1. This controller supplies the target for the momentum-based immersion and invariance (I\&I) adaptive design, denoted IAC 1.0.0. The analysis couples a positive-force domain with angular-sector invariance, parameter convergence, and physical motion--force tracking. The target-system immersion is detailed in the appendix. Exact measurements and ideal actuation are assumed throughout; tracking is included, with regulation obtained by setting the reference derivatives to zero.
+
+\section{Robot and Contact Model}\label{sec:model}
+\subsection{Robot Manipulator}
+
+Consider a 2-DoF robot manipulator constrained to move in a vertical plane. The joint-space dynamics is
+\begin{align*}
+M(q)\ddot q + C(q,\dot q)\dot q + G(q)
+=
+\tau + \tau_e .
+\end{align*}
+
+The joint position is $q\in\mathbb R^{2}$, $M(q)\in\mathbb R^{2\times 2}$ is symmetric positive definite, $C(q,\dot q)\dot q$ contains the Coriolis and centrifugal terms, $G(q)$ is the generally configuration-dependent gravity vector for motion in the vertical plane, $\tau$ is the actuator torque, and $\tau_e$ is the external torque induced by contact.
+
+The forward-kinematics map $h(q)\in\mathbb R^2$ gives the end-effector Cartesian position expressed in the robot-base frame for a given joint position $q$. The robot kinematic and dynamic models, including $h(q)$, $J(q)$, $M(q)$, $C(q,\dot q)$, and $G(q)$, are assumed to be exactly known.
+
+We assume that the inertial frame and robot-base frame coincide and denote this frame by $B$, with its first axis horizontal and its second axis vertically upward. The gravitational acceleration expressed in $B$ is $g_B=[0\;-g]^T$, where $g>0$. Let
+\begin{equation}\label{eq:position}
+\begin{aligned}
+p=h(q)\in\mathbb R^{2}
+\end{aligned}
+\end{equation}
+
+be the end-effector position expressed in $B$. The end-effector velocity is
+\begin{equation}\label{eq:velocity}
+\begin{aligned}
+\dot p = J(q)\dot q
+\end{aligned}
+\end{equation}
+
+Assume that $J(q)\in\mathbb R^{2\times 2}$ is nonsingular throughout the operating region. Then $J^{-1}(q)$ exists, and the task-space Cartesian robot dynamics can be written as
+\begin{equation}\label{eq:cartesian-dynamics}
+\begin{aligned}
+\Lambda(q)\ddot p+\eta(q,\dot q)=F+F_e,
+\end{aligned}
+\end{equation}
+
+where
+\begin{equation}\label{eq:cartesian-model}
+\begin{aligned}
+\Lambda &= J^{-T}MJ^{-1}, \quad \Lambda=\Lambda^T \succ {0} \\
+\eta &= J^{-T}(C\dot q+G)-\Lambda\dot J J^{-1}\dot p,
+\end{aligned}
+\end{equation}
+
+The commanded force and torque are related by
+\begin{equation}\label{eq:torque-map}
+F=J^{-T}\tau,\qquad \tau=J^TF.
+\end{equation}
+The physical contact force is $F_e=J^{-T}\tau_e$; gravity is included in $\eta$.
+The model derivatives are evaluated analytically as
+\begin{equation}\label{eq:model-derivatives}
+\begin{aligned}
+\dot J(q,\dot q)&=\sum_{i=1}^{2}\frac{\partial J(q)}{\partial q_i}\dot q_i,\\
+\dot\Lambda(q,\dot q)&=\sum_{i=1}^{2}\frac{\partial\Lambda(q)}{\partial q_i}\dot q_i.
+\end{aligned}
+\end{equation} 
+
+We assume 
+\begin{equation}\label{eq:inertia-bounds}
+\begin{aligned}
+0<\underline m I_2
+\preceq
+\Lambda(q)
+\preceq
+\overline m I_2
+\end{aligned}
+\end{equation}
+
+throughout a compact nonsingular operating region. Since $q$ and $\dot q$ are measured, and $J(q)$ is assumed nonsingular, the end-effector position and velocity can be updated with $q$ and $\dot q$ measurements.
+
+\subsection{Interaction Force}
+
+For rigid contact in the vertical plane, the physical interaction force model is
+\begin{align*}
+F_{e}=F_{n}+F_{t}=nf+F_{t},
+\end{align*}
+
+where $n\in S^{1}$ is the surface unit normal and $f=n^{T}F_{e}$ is the scalar normal force magnitude. The sign of $n$ is assumed to be fixed according to the contact convention. In particular, $n$ is chosen to point from the environment toward the robot/free-space side, so that under unilateral contact a compressive normal contact force can be written as
+\begin{align*}
+F_{n}=nf, \qquad f\geq 0.
+\end{align*}
+
+Here $f$ is the compressive normal-force magnitude. The unilateral surface can exert a compressive reaction but cannot exert a tensile reaction.
+
+The tangential frictional force $F_{t}$ satisfies $n^{T}F_{t}=0$, hence we can write $F_{t}=QF_{e}$, where the tangential subspace projector is
+\begin{equation}\label{eq:tangent-projector}
+Q=I_2-nn^T.
+\end{equation}
+In the frictionless contact case, $F_{t}=0$,
+\begin{equation}\label{eq:frictionless-force}
+\begin{aligned}
+F_{e}=F_{n}=nf.
+\end{aligned}
+\end{equation}
+
+Thus frictionless contact is a special case of the same physical model.
+
+We assume that the force sensor can either measure the physical force vector or the scalar normal force and denote these measurements as $F_{m}$ and $f_{m}$, respectively. When exact scalar force feedback is assumed, we have $f_{m}=f$.
+
+In the frictionless case with $f>0$, exact full-vector feedback would reveal the force in \eqref{eq:frictionless-force} and immediately give
+\begin{equation}\label{eq:normal-from-vector}
+\begin{aligned}
+n=\frac{F_{e}}{\|F_{e}\|}.
+\end{aligned}
+\end{equation}
+
+Hence, under the joint conditions of frictionless contact and $f>0$, the surface normal would be algebraically known and geometry adaptation would become unnecessary. The reconstruction in \eqref{eq:normal-from-vector} is not used when friction is present or when $f=0$.
+
+\subsection{Contact Surface}
+
+The fixed contact surface is modeled as a straight line of arbitrary orientation in the vertical workspace
+\begin{equation}\label{eq:contact-surface}
+\begin{aligned}
+\mathcal{S} =
+\left\{
+p\in\mathbb{R}^{2} \ |\ \phi(p)=n^{T}(p-p_{0})=0
+\right\},
+\end{aligned}
+\end{equation}
+
+where $n\in S^{1}$ is a constant unit normal vector. Analysis begins after contact has already been established, and the controller-initialization time is $t_c=0$. The surface-frame origin is chosen as the contact position at initialization, i.e.
+\begin{align*}
+p_{0}=p(t_{c})=p(0), \qquad t_c=0,
+\end{align*}
+
+After initialization, $p_{0}$ is kept fixed.
+
+When the rigid contact is maintained, 
+\begin{equation}\label{eq:contact-constraints}
+\begin{aligned}
+n^T\dot p=0,
+\qquad
+n^T\ddot p=0.
+\end{aligned}
+\end{equation}
+
+We assume the initial condition satisfies 
+\begin{equation}\label{eq:initial-contact}
+\begin{aligned}
+\phi(p(0)) & = 0, \\
+n^{T}\dot p(0) & = 0.
+\end{aligned}
+\end{equation}
+
+The unilateral contact conditions are
+\begin{align*}
+\phi(p)&\geq0,\qquad f\geq0,\qquad f\phi(p)=0.
+\end{align*}
+
+The constrained dynamics below describe the active-contact branch $\phi(p)=0$ with zero normal velocity. A strictly positive calculated reaction certifies that this branch is compatible with unilateral contact. The controller analysis verifies this condition for the stated initial conditions and operating domain; the model does not include contact establishment, impacts, or transitions to other contact modes.
+
+The tangential projector is defined in \eqref{eq:tangent-projector}.
+
+Define the tangent unit vector
+\begin{equation}\label{eq:tangent-definition}
+\begin{aligned}
+T=T(n)=R_{\text{-90}}n\in\mathbb R^2,
+\qquad
+R_{\text{-90}}=
+\begin{bmatrix}
+0&1\\
+-1&0
+\end{bmatrix}.
+\end{aligned}
+\end{equation}
+
+The clockwise $90^\circ$ rotation fixes the tangent orientation uniquely for each unit normal. The tangent vector satisfies
+\begin{equation}\label{eq:tangent-identities}
+\begin{aligned}
+T^TT=1,\qquad T^Tn=0,\qquad TT^T=Q.
+\end{aligned}
+\end{equation}
+
+The contact surface frame is defined by the rotation matrix
+\begin{equation}\label{eq:contact-frame}
+\begin{aligned}
+R_{s}
+=
+\begin{bmatrix}
+T & n
+\end{bmatrix}.
+\end{aligned}
+\end{equation}
+
+Since the two basis vectors are mutually orthonormal and right-handed,
+\begin{align*}
+R_{s}^{T}R_{s}=I_2,
+\qquad
+\det R_{s}=1,
+\end{align*}
+
+and therefore
+\begin{align*}
+R_{s}\in SO(2).
+\end{align*}
+
+The corresponding contact-frame coordinates of the end-effector are
+\begin{align*}
+x
+=
+R_{s}^{T}(p-p_{0})
+=
+\begin{bmatrix}
+x_{t} \\
+x_{n}
+\end{bmatrix}.
+\end{align*}
+
+Under rigid maintained contact,
+\begin{align*}
+x_{n}
+=
+n^{T}(p-p_{0})
+\equiv 0.
+\end{align*}
+
+Hence the motion on the surface is completely represented by the intrinsic 1-D coordinate
+\begin{equation}\label{eq:intrinsic-position}
+\begin{aligned}
+x_{t} = T^{T}(p-p_{0}) \in\mathbb{R}.
+\end{aligned}
+\end{equation}
+
+Since the contact line is fixed, $T$ is constant, and
+\begin{equation}\label{eq:contact-motion}
+\begin{aligned}
+p&=p_0+Tx_{t},\\
+\dot p&=T\dot x_{t},\\
+\ddot p&=T\ddot x_{t}.
+\end{aligned}
+\end{equation}
+
+\subsection{Motion-Force Decoupled Dynamics}
+
+Using $T$, the tangential force can be written as
+\begin{align*}
+F_{t} = Tf_{t},
+\end{align*}
+
+where $f_{t}=T^T F_{t} \in \mathbb{R}$ is the tangential force expressed along the tangent $T$. Note that in the frictionless case $f_{t}=0$. In the general case,
+\begin{align*}
+F_{e}=nf+Tf_{t},
+\end{align*}
+
+Substituting $F_e$ into \eqref{eq:cartesian-dynamics} yields
+\begin{align*}
+\Lambda T\ddot x_{t}+\eta
+=
+F+nf+Tf_{t}.
+\end{align*}
+
+Define the scalar tangential inertia $\Lambda_t=T^T\Lambda T>0$. Tangential projection of the dynamics then yields
+\begin{equation}\label{eq:tangential-dynamics}
+\begin{aligned}
+\Lambda_{t}\ddot x_{t}
+=
+T^{T}(F-\eta)+f_{t}.
+\end{aligned}
+\end{equation}
+
+Projecting the same task-space dynamics onto the normal direction gives
+\begin{align*}
+f
+=
+n^{T}\Lambda T\ddot x_{t}
+-
+n^{T}(F-\eta).
+\end{align*}
+
+Using the acceleration constraint in \eqref{eq:contact-constraints},
+
+we obtain
+\begin{align*}
+f
+=
+-
+\frac{
+n^{T}\Lambda^{-1}(F-\eta+F_{t})
+}{
+n^{T}\Lambda^{-1}n
+}.
+\end{align*}
+
+In frictionless case, 
+\begin{equation}\label{eq:reaction-force}
+\begin{aligned}
+f
+=
+-
+\frac{
+n^{T}\Lambda^{-1}(F-\eta)
+}{
+n^{T}\Lambda^{-1}n
+}.
+\end{aligned}
+\end{equation}
+
+\section{Full-Information Motion--Force Control}\label{sec:fic}
+\subsection{Reference Architecture}
+
+For regulation problems, the desired tangential position can either be given as the task-space reference $p_{d} \in \mathbb{R}^2$, or as the one-dimensional intrinsic reference in the vertical plane $x_{t,d}\in\mathbb{R}$. When the true surface geometry is known, $T=T(n)$ is constant, $p_{d}$ and $x_{t,d}$ are related by the surface geometry
+\begin{equation}\label{eq:reference-position}
+\begin{aligned}
+p_{d} & = p_{0}+Tx_{t,d}.
+\end{aligned}
+\end{equation}
+
+The desired constant normal force is 
+\begin{align*}
+f_{d}>0.
+\end{align*}
+
+For tracking problems, $p_d(t)$ and $x_{t,d}(t)$ are time-varying. Differentiating \eqref{eq:reference-position} gives
+\begin{align*}
+\dot p_d&=T\dot x_{t,d},\\
+\ddot p_d&=T\ddot x_{t,d}.
+\end{align*}
+
+ where the time-dependencies are removed for notation simplicity. 
+ 
+Time-varying force tracking is outside the scope of this work.
+
+\subsection{Error Coordinate}
+
+The motion error can be expressed in task-space coordinates or in the one-dimensional surface tangential coordinate. The corresponding errors are denoted by $e_p$ and $e_t$, respectively. Define
+\begin{equation}\label{eq:motion-errors}
+\begin{aligned}
+e_p&=p_{d}-p\in\mathbb R^2,\\
+e_t&=x_{t,d}-x_t\in\mathbb R.
+\end{aligned}
+\end{equation}
+
+With known geometry and under maintained contact, both $p$ and $p_d$ lie on the true contact line. By \eqref{eq:contact-motion}, the two error representations satisfy
+\begin{equation}\label{eq:error-geometry}
+\begin{aligned}
+e_p&=Te_t,\\
+e_t&=T^Te_p,\\
+Qe_p&=e_p,\qquad n^Te_p=0.
+\end{aligned}
+\end{equation}
+
+Given that $T^TT=1$,
+\begin{align*}
+\|e_p\|^2=e_t^2.
+\end{align*}
+
+Consequently, $e_p\to0$ and $e_t\to0$ describe the same motion-tracking objective. The normal component of the position error is identically zero under the rigid-contact constraint. 
+
+The contact line and its tangent $T$ are fixed. For regulation, $p_d$ and $x_{t,d}$ are constant, so
+\begin{align*}
+\dot e_p&=-\dot p,\qquad \ddot e_p=-\ddot p,\\
+\dot e_t&=-\dot x_t,\qquad \ddot e_t=-\ddot x_t.
+\end{align*}
+
+For a time-varying reference,
+\begin{equation}\label{eq:error-derivatives}
+\begin{aligned}
+\dot e_p&=\dot p_d-\dot p=T\dot e_t,\\
+\dot e_t&=\dot x_{t,d}-\dot x_t,\\
+\ddot e_p&=\ddot p_d-\ddot p=T\ddot e_t,\\
+\ddot e_t&=\ddot x_{t,d}-\ddot x_t.
+\end{aligned}
+\end{equation}
+
+The normal interaction is regulated through the force error. For the constant desired normal force $f_d>0$, define
+\begin{equation}\label{eq:force-error}
+\begin{aligned}
+e_f=f_d-f.
+\end{aligned}
+\end{equation}
+
+With exact scalar force feedback, $f_m=f$, the error in \eqref{eq:force-error} is computed using the measured force.
+
+The combined motion-force objective is $e_t\to0$ and $e_f\to0$, equivalently $e_p\to0$ and $e_f\to0$.
+\subsection{Nominal Motion-Force Control}
+
+Define the tangential task-space acceleration command $u_{p}\in\mathbb{R}^2$, its scalar tangential-subspace representation $u_{t}\in\mathbb{R}$, and the physical normal-force command $u_{f}\in\mathbb{R}$. The two acceleration-command representations satisfy
+\begin{equation}\label{eq:command-geometry}
+\begin{aligned}
+u_{p}=Tu_{t},\qquad u_{t}=T^Tu_{p},\qquad n^Tu_{p}=0.
+\end{aligned}
+\end{equation}
+
+When the real surface geometry is known, choose a nominal controller with exact dynamic and gravity compensation through $\eta$
+\begin{align*}
+F = \eta + \Lambda u_{p} - Tf_{t} - nu_{f}
+= \eta + \Lambda T u_{t} - Tf_{t} - nu_{f}.
+\end{align*}
+
+For frictionless contact, the nominal controller becomes
+\begin{equation}\label{eq:nominal-force-law}
+\begin{aligned}
+F = \eta + \Lambda u_{p} - nu_{f}
+= \eta + \Lambda T u_{t} - nu_{f}.
+\end{aligned}
+\end{equation}
+
+Substituting the controller into the task-space dynamics yields the nominal closed-loop
+\begin{equation}\label{eq:nominal-closed-loop}
+\begin{aligned}
+\ddot p&=u_{p}, \\
+\ddot x_{t}&=u_{t}, \\
+f&=u_{f}.
+\end{aligned}
+\end{equation}
+
+The explicit realization of $u_{p}$, equivalently $u_{t}$, and $u_{f}$ depends on specific controller designs. For initially established unilateral contact, a strictly positive reaction $f=u_f>0$ makes this constrained solution admissible and maintains contact. The task-space controller below gives $f=f_d>0$ in the ideal model, so its established-contact operation is compatible with the unilateral contact assumption.
+
+\subsection{Task-Space Regulation and Tracking (FIC 1)}
+
+This full-information controller follows a twice continuously differentiable task-space reference $p_d(t)$ on the fixed true contact line. The signals $p_d$, $\dot p_d$, and $\ddot p_d$ are known, and the desired normal force remains the constant $f_d>0$. The Cartesian motion errors are defined in \eqref{eq:motion-errors} and \eqref{eq:error-derivatives}. The frictionless rigid unilateral contact and exact scalar force measurement $f_m=f$ specified in Section~\ref{sec:model} are assumed throughout.
+
+Choose scalar gains $k_p>0$, $k_v>0$, and $k_f\geq0$ for both controller realizations below. Regulation is the constant-reference special case of tracking, and both realizations yield the same closed-loop system in error coordinates.
+
+\subsubsection{Regulator}
+
+For a constant desired point $p_d$ on the contact line, $\dot p_d=\ddot p_d=0$ and $\dot e_p=-\dot p$. Define
+\begin{align}
+u_p&=k_pe_p-k_v\dot p,\label{eq:regulation-command}\\
+u_f&=f_d+k_fe_f.\label{eq:force-command}
+\end{align}
+
+The force and torque follow \eqref{eq:nominal-force-law} and \eqref{eq:torque-map}, with the measured force error from \eqref{eq:force-error}. By \eqref{eq:error-geometry} and \eqref{eq:contact-constraints}, the command satisfies \eqref{eq:command-geometry}. Thus this Cartesian control law realizes the nominal tangential acceleration command without computing $x_t$ or $x_{t,d}$.
+
+\subsubsection{Tracking Controller}
+
+For a time-varying reference $p_d(t)$ on the contact line, define
+\begin{equation}\label{eq:tracking-command}
+\begin{aligned}
+u_p=\ddot p_d+k_v\dot e_p+k_pe_p.
+\end{aligned}
+\end{equation}
+
+Use the force command \eqref{eq:force-command}, the force law \eqref{eq:nominal-force-law}, and the torque map \eqref{eq:torque-map}. The reference acceleration $\ddot p_d$ provides motion feedforward, while the position and velocity error terms provide feedback. The $\eta$ term compensates the known robot dynamics, including gravity in the vertical plane. The choice $k_f=0$ gives the feedforward normal-force command $u_{f}=f_d$.
+
+The feasible reference, the contact constraints \eqref{eq:contact-constraints}, and the error geometry \eqref{eq:error-geometry} make the tracking command tangential, as required by \eqref{eq:command-geometry}.
+
+Consequently, the task-space command is tangential and realizes the nominal motion-force controller with
+\begin{equation}\label{eq:intrinsic-command}
+\begin{aligned}
+u_{t}&=T^Tu_{p}
+=\ddot x_{t,d}+k_v\dot e_t+k_pe_t.
+\end{aligned}
+\end{equation}
+
+These relations identify the intrinsic command for the analysis; the implemented Cartesian force law uses $p_d$, $\dot p_d$, and $\ddot p_d$ directly without computing $x_t$ or $x_{t,d}$.
+
+\subsubsection{Closed-Loop Error Dynamics}
+
+For the tracking controller, substitution into \eqref{eq:nominal-closed-loop} gives
+\begin{align*}
+\ddot p&=\ddot p_d+k_v\dot e_p+k_pe_p,\\
+f&=f_d+k_f(f_d-f).
+\end{align*}
+
+Using $\ddot e_p=\ddot p_d-\ddot p$ and rearranging yields
+\begin{equation}\label{eq:fic-error-dynamics}
+\begin{aligned}
+\ddot e_p+k_v\dot e_p+k_pe_p&=0,\\
+(1+k_f)e_f&=0.
+\end{aligned}
+\end{equation}
+
+For the regulation controller, $\ddot p_d=0$ and $\dot e_p=-\dot p$ give the same error equations. Hence the following analysis applies to both controller realizations.
+
+Equivalently, projection onto the fixed tangent gives
+\begin{equation}\label{eq:fic-tangential-error}
+\begin{aligned}
+\ddot e_t+k_v\dot e_t+k_pe_t=0.
+\end{aligned}
+\end{equation}
+
+\subsubsection{Stability for Regulation and Tracking}
+
+Each Cartesian motion-error component satisfies the characteristic equation
+\begin{align*}
+\mu^2+k_v\mu+k_p=0.
+\end{align*}
+
+Since $k_p>0$ and $k_v>0$, both roots have strictly negative real parts. Thus the motion-error equilibrium $(e_p,\dot e_p)=(0,0)$ is exponentially stable on the maintained-contact state space, and
+\begin{align*}
+p(t)-p_d(t)&\to0,\\
+\dot p(t)-\dot p_d(t)&\to0,\\
+e_t(t)&\to0.
+\end{align*}
+
+Since $1+k_f>0$, the algebraic force-error relation gives $e_f=0$, or $f=f_d$, exactly in the ideal rigid-contact model. Both controllers therefore achieve exponential convergence of the motion errors and exact regulation of the constant normal force while the trajectory remains in the nonsingular operating region and rigid contact is maintained. For a constant reference, this gives $p\to p_d$ and $\dot p\to0$; for a time-varying reference, it gives $p-p_d\to0$ and $\dot p-\dot p_d\to0$.
+
+\section{Immersion and Invariance Adaptive Control}\label{sec:iac}
+\subsection{Surface-Angle Parameterization}
+Since the surface normal satisfies $n\in S^{1}$, the geometry estimate $\hat n$ should remain on the same unit circle. Choose a fixed unit reference vector $n_0\in S^{1}$. Define the planar rotation as
+\begin{align*}
+R_{2}(\theta)
+=
+\begin{bmatrix}
+\cos\theta&-\sin\theta\\
+\sin\theta&\cos\theta
+\end{bmatrix}
+\in SO(2).
+\end{align*}
+
+The true and estimated normals are
+\begin{equation}\label{eq:normal-parameterization}
+\begin{aligned}
+n&=R_{2}(\theta)n_0, \qquad
+\hat n=R_{2}(\hat\theta)n_0.
+\end{aligned}
+\end{equation}
+
+For example, choose the upward unit vector $n_0=[0\;1]^T$ in $B$. Then
+\begin{align*}
+n&=\begin{bmatrix}-\sin\theta\\\cos\theta\end{bmatrix}, \qquad
+\hat n=\begin{bmatrix}-\sin\hat\theta\\\cos\hat\theta\end{bmatrix}.
+\end{align*}
+
+Here $\theta=0$ corresponds to a horizontal contact line with an upward normal. With the tangent convention \eqref{eq:tangent-definition}, $\theta$ is the counterclockwise inclination of the tangent from the positive horizontal axis. 
+
+The scalar angles are defined modulo $2\pi$. Since $R_{2}(\cdot)$ is orthogonal,
+\begin{align*}
+\|n\|=\|\hat n\|=1
+\end{align*}
+
+for all values of $\theta$ and $\hat\theta$. Consequently, an adaptive law may update the scalar parameter $\hat\theta$ without requiring an additional unit-norm constraint on $\hat n$. The estimated projector and tangent basis are
+\begin{align*}
+\hat Q&=I_2-\hat n\hat n^{T}, \\
+\hat T&=T(\hat n)=R_{\text{-90}}\hat n\in\mathbb R^2.
+\end{align*}
+
+\subsection{Effective Estimate and Parameter Manifold}
+Instead of using the raw parameter estimate $\hat\theta$, I\&I adaptive control introduces an additional  estimate correction term $\beta(x_{syst})$, where $x_{syst}$ refers to the system states, and is omitted when writing $\beta$ for simplicity. We therefore define the I\&I effective estimate 
+\begin{equation}\label{eq:effective-angle}
+\begin{aligned}
+\bar\theta=\hat\theta+\beta.
+\end{aligned}
+\end{equation}
+
+The corresponding estimate of $n$ is
+\begin{equation}\label{eq:effective-normal}
+\begin{aligned}
+\bar n=R_{2}(\bar\theta)n_0=R_{2}(\beta)\hat n.
+\end{aligned}
+\end{equation}
+
+Define the I\&I parameter estimate error
+\begin{equation}\label{eq:parameter-error}
+\begin{aligned}
+z
+=
+\bar\theta-\theta
+=
+\hat\theta-\theta+\beta,
+\end{aligned}
+\end{equation}
+
+then 
+\begin{align*}
+\bar n=R_{2}(z)n.
+\end{align*}
+
+We note that corresponding to $z=0$, is nominally defined as 
+\begin{equation}\label{eq:parameter-manifold}
+\begin{aligned}
+\mathcal M=\{(x_{syst},\hat\theta):\hat\theta-\theta+\beta=0\}.
+\end{aligned}
+\end{equation}
+
+A successful I\&I adaptive control design constructs an invariant and attractive $\mathcal M$, which means (i) if $z(0)=0$, then $z(t)\equiv{0}$; (ii) if $z(0)\neq{0}$ , then $z(t)\to{0}$. Hence on this manifold, $\bar n=n$, and the IAC reduces to the FIC.
+
+With $T=R_{\text{-90}}n$ and $\bar T=T(\bar n)=R_{\text{-90}}\bar n$, the 2-D rotation geometry gives
+\begin{equation}\label{eq:rotated-geometry}
+\begin{aligned}
+\bar n&=\cos z\,n-\sin z\,T,\\
+\bar T&=\sin z\,n+\cos z\,T.
+\end{aligned}
+\end{equation}
+
+Hence
+\begin{equation}\label{eq:geometry-identities}
+\begin{aligned}
+n^T\bar n&=\cos z,\\
+T^T\bar T&=\cos z,\\
+T^T\bar n&=-\sin z,\\
+n^T\bar T&=\sin z.
+\end{aligned}
+\end{equation}
+
+\subsection{Task-Space Control With an Uncertain Surface Angle (IAC 1.0.0)}
+
+This design takes FIC 1 with $k_f=0$ as the target system. The reference $p_d(t)$ lies on the true fixed contact line, and $p_d$, $\dot p_d$, and $\ddot p_d$ are known and bounded. Regulation is obtained by setting $\dot p_d=\ddot p_d=0$. The robot model is known, the constant surface angle $\theta$ is unknown, and frictionless rigid unilateral contact is already established at initialization, with $\phi(p(0))=0$ and $n^T\dot p(0)=0$.
+
+As in FIC 1, the scalar normal contact force $f\geq0$ is measured exactly, with $f_m=f$, and the update law below uses $f$ directly. The construction gives a local angular domain on which the closed loop guarantees a strictly positive compressive reaction, maintains unilateral contact, and achieves exponential parameter convergence. Contact establishment, impacts, and contact-mode transitions are excluded. No force-vector measurement, acceleration measurement, or numerical differentiation of the measured force is required.
+
+\subsubsection{Target System}
+
+Use the Cartesian acceleration command \eqref{eq:tracking-command} directly, with the errors in \eqref{eq:motion-errors} and \eqref{eq:error-derivatives} and gains $k_p,k_v>0$.
+
+Because the reference and actual motion lie on the true contact line, $n^Tu_p=0$, even though $n$ is unknown. Thus $u_p$ can be computed without estimating a projector or differentiating an estimated reference. The target motion dynamics are \eqref{eq:fic-error-dynamics}; with $k_f=0$, the force error in \eqref{eq:force-error} vanishes exactly. Thus the target coincides with FIC 1.
+
+\subsubsection{Explicit Momentum Correction and Controller}
+
+Choose a known nominal angle $\theta_c$ and define fixed directions
+\begin{align*}
+n_c&=R_2(\theta_c)n_0,\\
+T_c&=R_{\text{-90}}n_c.
+\end{align*}
+
+The subscript $c$ denotes the chosen angular center, rather than the controller-initialization time $t_c$.
+
+Define the measurable Cartesian momentum and its known drift:
+\begin{equation}\label{eq:momentum-model}
+\begin{aligned}
+m_p&=\Lambda(q)\dot p,\\
+g_p&=F-\eta+\dot\Lambda(q,\dot q)\dot p,\\
+\dot m_p&=g_p+nf.
+\end{aligned}
+\end{equation}
+
+Here $\dot\Lambda$ is computed from \eqref{eq:model-derivatives} using the known model and measured joint position and velocity. Ideal actuation is assumed: actuator dynamics, communication delays, saturation, and torque-tracking errors are neglected, so the actual applied joint torque satisfies $\tau_{\mathrm{act}}=\tau_{\mathrm{cmd}}=J^TF$. Consequently, the current force command $F$ is used directly to evaluate $g_p$.
+
+Choose $\gamma>0$ and the explicit I\&I correction
+\begin{equation}\label{eq:momentum-correction}
+\begin{aligned}
+\beta(q,\dot q)=-\gamma T_c^Tm_p.
+\end{aligned}
+\end{equation}
+
+The effective angle and normal follow \eqref{eq:effective-angle} and \eqref{eq:effective-normal}. Use the following force law, with torque given by \eqref{eq:torque-map}:
+\begin{equation}\label{eq:adaptive-force-law}
+\begin{aligned}
+F=\eta+\Lambda u_p-\bar n f_d.
+\end{aligned}
+\end{equation}
+
+This force law retains the Cartesian acceleration command $u_p$ and dynamic compensation of FIC 1, sets $k_f=0$ so that $u_f=f_d$, and replaces the true normal $n$ by the effective estimate $\bar n$. When $z=0$, $\bar n=n$ and the force law coincides exactly with FIC 1. The choice $k_f=0$ keeps the normal-force command constant and simplifies the convergence analysis; it is not required by the I\&I method. In the ideal rigid-contact model, $\bar n=n$ already gives $f=f_d$ with this feedforward force command. The force-command channel therefore uses feedforward, while the measured force $f$ still enters the adaptive update and adjusts the commanded force direction through $\bar n$.
+
+Update the internal estimate according to
+\begin{equation}\label{eq:adaptive-update}
+\begin{aligned}
+\dot{\hat\theta}
+&=\gamma T_c^T\left(g_p+\bar n f\right).
+\end{aligned}
+\end{equation}
+
+The correction uses the fixed vector $T_c$, so the effective angle is explicit. No implicit angle inversion or unknown effective angular velocity is needed. Initialize the internal coordinate using the chosen effective angle:
+\begin{equation}\label{eq:estimate-initialization}
+\begin{aligned}
+\hat\theta(0)
+=\bar\theta(0)+\gamma T_c^T\Lambda(q(0))\dot p(0).
+\end{aligned}
+\end{equation}
+
+For regulation, use \eqref{eq:regulation-command}; the correction and update law are unchanged. All implemented expressions use the known robot model, the reference, $q$, $\dot q$, the measured scalar force $f$, and the internal state $\hat\theta$.
+
+\subsubsection{Actual Closed-Loop Error Dynamics}
+
+On the active-contact branch, substituting the force law into the true dynamics gives
+\begin{equation}\label{eq:adaptive-closed-loop}
+\begin{aligned}
+\Lambda(\ddot p-u_p)&=nf-\bar n f_d.
+\end{aligned}
+\end{equation}
+
+\paragraph{Angle-Estimation Error}
+
+Differentiate the error in \eqref{eq:parameter-error} using the correction \eqref{eq:momentum-correction}, the momentum model \eqref{eq:momentum-model}, and the update \eqref{eq:adaptive-update}:
+\begin{align*}
+\dot z
+&=\dot{\hat\theta}-\gamma T_c^T\dot m_p\\
+&=\gamma f\,T_c^T(\bar n-n)\\
+&=-\gamma f\left[
+\sin(\bar\theta-\theta_c)-\sin(\theta-\theta_c)
+\right].
+\end{align*}
+
+This equation is derived from the implemented update and the true plant. It does not require knowledge of $z$ or $n$. Define the averaged slope of the sine map $\vartheta\mapsto\sin(\vartheta-\theta_c)$ as
+\begin{equation}\label{eq:sine-slope}
+\begin{aligned}
+H(\bar\theta,\theta)
+&=\int_0^1\cos(\theta-\theta_c+s z)\,ds.
+\end{aligned}
+\end{equation}
+
+The fundamental theorem of calculus applied to \eqref{eq:sine-slope} gives
+\begin{align*}
+\sin(\bar\theta-\theta_c)-\sin(\theta-\theta_c)&=H(\bar\theta,\theta)z.
+\end{align*}
+
+Hence
+\begin{equation}\label{eq:parameter-error-dynamics}
+\begin{aligned}
+\dot z&=-\gamma fH(\bar\theta,\theta)z.
+\end{aligned}
+\end{equation}
+
+These identities hold before imposing an angular-domain or force-sign restriction.
+
+\paragraph{Motion Error}
+
+Under maintained contact, the acceleration and command have the tangential representations in \eqref{eq:contact-motion} and \eqref{eq:command-geometry}.
+
+Left-multiplying \eqref{eq:adaptive-closed-loop} by $T^T$ gives
+\begin{align*}
+T^T\Lambda(\ddot p-u_p)
+&=T^Tnf-T^T\bar n f_d.
+\end{align*}
+
+Substitute the tangential representations above and use \eqref{eq:tangent-identities}, \eqref{eq:geometry-identities}, and the tangential inertia in \eqref{eq:tangential-dynamics}:
+\begin{align*}
+T^T\Lambda T\left(\ddot x_t-T^Tu_p\right)
+&=0-(-\sin z)f_d,\\
+\Lambda_t\left(\ddot x_t-T^Tu_p\right)
+&=f_d\sin z.
+\end{align*}
+
+The true normal contact force $nf$ contributes no tangential component, whereas the estimated force direction contributes through $T^T\bar n=-\sin z$. Dividing by $\Lambda_t>0$ yields
+\begin{align*}
+\ddot x_t&=T^Tu_p+\frac{f_d}{\Lambda_t}\sin z.
+\end{align*}
+
+Substituting \eqref{eq:tracking-command} and using \eqref{eq:intrinsic-command} and \eqref{eq:motion-errors} yields
+\begin{equation}\label{eq:adaptive-motion-error}
+\begin{aligned}
+\ddot e_t+k_v\dot e_t+k_pe_t
+&=-\frac{f_d}{\Lambda_t}\sin z.
+\end{aligned}
+\end{equation}
+
+The effective parameter error $z=\bar\theta-\theta$ therefore enters the motion-error system as the disturbance $-f_d\sin z/\Lambda_t$. Since $k_p,k_v>0$ and $\Lambda_t\geq\underline m>0$, the nominal motion-error dynamics are exponentially stable and this disturbance is bounded even before the parameter estimate converges. Convergence of the effective estimate, $\bar\theta\to\theta$, makes the disturbance vanish and is sufficient for $e_t,\dot e_t\to0$, hence for Cartesian motion tracking under maintained contact.
+
+Parameter mismatch can otherwise leave a tracking bias: for constant $\Lambda_t$ and a residual angle error $z_*$, the steady motion error is $e_{t,\infty}=-f_d\sin z_*/(k_p\Lambda_t)$. If the parameter error instead converges exponentially to zero, the motion errors also converge exponentially, with a decay rate governed by both the parameter convergence and the nominal motion dynamics. Thus the motion loop remains stable during adaptation, while parameter convergence removes the geometry-induced forcing that can prevent exact tracking.
+
+\paragraph{Contact Force}
+
+Using \eqref{eq:contact-constraints} and \eqref{eq:command-geometry} in \eqref{eq:reaction-force}, define the reaction factor and express the force as
+\begin{equation}\label{eq:reaction-factor}
+\begin{aligned}
+f&=\rho(q,z)f_d,\\
+\rho(q,z)&=\frac{n^T\Lambda^{-1}\bar n}{n^T\Lambda^{-1}n}.
+\end{aligned}
+\end{equation}
+
+Substituting \eqref{eq:rotated-geometry} into \eqref{eq:reaction-factor} gives
+\begin{align*}
+\rho(q,z)
+&=\frac{n^T\Lambda^{-1}(\cos z\,n-\sin z\,T)}
+{n^T\Lambda^{-1}n}\\
+&=\cos z-\frac{n^T\Lambda^{-1}T}{n^T\Lambda^{-1}n}\sin z.
+\end{align*}
+
+To express the coefficient using $\Lambda$ rather than $\Lambda^{-1}$, write the inertia in the orthonormal frame \eqref{eq:contact-frame}:
+\begin{align*}
+R_s^T\Lambda R_s
+&=\begin{bmatrix}a&b\\b&c\end{bmatrix},\\
+a&=T^T\Lambda T=\Lambda_t,\qquad
+b=T^T\Lambda n,\qquad c=n^T\Lambda n,\\
+R_s^T\Lambda^{-1}R_s
+&=(R_s^T\Lambda R_s)^{-1}
+=\frac{1}{ac-b^2}
+\begin{bmatrix}c&-b\\-b&a\end{bmatrix}.
+\end{align*}
+
+The numerator and denominator in the coefficient of $\sin z$ are $n^T\Lambda^{-1}T$ and $n^T\Lambda^{-1}n$. Since the columns of $R_s$ are $T$ and $n$, expanding the transformed matrix shows where these two quantities appear:
+\begin{align*}
+R_s^T\Lambda^{-1}R_s
+&=\begin{bmatrix}T^T\\n^T\end{bmatrix}
+\Lambda^{-1}
+\begin{bmatrix}T&n\end{bmatrix}
+=\begin{bmatrix}
+T^T\Lambda^{-1}T&T^T\Lambda^{-1}n\\
+n^T\Lambda^{-1}T&n^T\Lambda^{-1}n
+\end{bmatrix}.
+\end{align*}
+
+Comparing its $(2,1)$ and $(2,2)$ entries with the explicit inverse above yields
+\begin{align*}
+n^T\Lambda^{-1}T&=-\frac{b}{ac-b^2},\\
+n^T\Lambda^{-1}n&=\frac{a}{ac-b^2}.
+\end{align*}
+
+Substituting these expressions into the coefficient of $\sin z$, and using $a=\Lambda_t$ and $b=T^T\Lambda n$, gives
+\begin{align*}
+-\frac{n^T\Lambda^{-1}T}{n^T\Lambda^{-1}n}
+&=-\frac{-b/(ac-b^2)}{a/(ac-b^2)}
+=\frac{b}{a}
+=\frac{T^T\Lambda n}{\Lambda_t}
+\end{align*}
+
+We define the normalized tangential-normal inertia coupling term as
+\begin{equation}\label{eq:inertia-coupling}
+\begin{aligned}
+r_\Lambda(q)=\frac{T^T\Lambda n}{\Lambda_t}.
+\end{aligned}
+\end{equation}
+
+Consequently,
+\begin{equation}\label{eq:force-factor}
+\begin{aligned}
+\rho(q,z)&=\cos z+r_\Lambda(q)\sin z.
+\end{aligned}
+\end{equation}
+
+The actual force follows from \eqref{eq:reaction-factor}.
+
+\subsubsection{Positive Contact Force Domain}
+
+By \eqref{eq:reaction-factor} and $f_d>0$, a positive lower bound on $\rho$ guarantees positive contact force. We first bound the normalized inertia coupling \eqref{eq:inertia-coupling}, then select an angular sector and prove that the implemented update preserves it. This combines force positivity and parameter convergence in one domain argument.
+
+We first determine the inertia coupling bound. For the planar arm, the eigenvalues of $\Lambda(q)$ are the effective masses along its inertia principal directions. Their uniform bounds $0<\underline m\leq\lambda_1(q)\leq\lambda_2(q)\leq\overline m$ give a configuration-independent limit on the normalized tangential--normal coupling $|r_\Lambda(q)|$. Define the uniform inertia coupling bound $\chi_\Lambda$ by
+\begin{equation}\label{eq:coupling-constant}
+\begin{aligned}
+\chi_\Lambda
+&=\frac{\overline m-\underline m}{2\sqrt{\overline m\,\underline m}}.
+\end{aligned}
+\end{equation}
+
+Our goal is to prove that this quantity bounds the normalized inertia coupling throughout the operating region:
+\begin{equation}\label{eq:coupling-bound}
+\begin{aligned}
+|r_\Lambda(q)|&\leq\chi_\Lambda.
+\end{aligned}
+\end{equation}
+
+To establish this bound, use the contact-frame inertia defined above, with $a=\Lambda_t>0$ and the coupling in \eqref{eq:inertia-coupling}. The orthogonal change of coordinates preserves the inertia eigenvalues, denoted by $0<\lambda_1\leq\lambda_2$. The trace and determinant therefore satisfy
+\begin{align*}
+a+c&=\lambda_1+\lambda_2,\\
+ac-b^2&=\lambda_1\lambda_2.
+\end{align*}
+
+Eliminating $c$ expresses the coupling entry $b$ in terms of $a$ and the eigenvalues:
+\begin{align*}
+b^2
+&=a(\lambda_1+\lambda_2-a)-\lambda_1\lambda_2\\
+&=(a-\lambda_1)(\lambda_2-a).
+\end{align*}
+
+Divide by $a^2$ and complete the square in $1/a$:
+\begin{align*}
+\frac{b^2}{a^2}
+&=\frac{\lambda_1+\lambda_2}{a}-1
+-\frac{\lambda_1\lambda_2}{a^2}\\
+&=\frac{(\lambda_2-\lambda_1)^2}{4\lambda_1\lambda_2}
+-\lambda_1\lambda_2\left(
+\frac{1}{a}-\frac{\lambda_1+\lambda_2}{2\lambda_1\lambda_2}
+\right)^2\\
+&\leq\frac{(\lambda_2-\lambda_1)^2}{4\lambda_1\lambda_2}.
+\end{align*}
+
+Taking square roots gives the coupling bound for this inertia. To make it uniform over the robot operating region, use $\underline m\leq\lambda_1\leq\lambda_2\leq\overline m$:
+\begin{align*}
+|r_\Lambda|
+&=\frac{|b|}{a}
+\leq\frac{\lambda_2-\lambda_1}{2\sqrt{\lambda_1\lambda_2}}\\
+&=\frac12\left(
+\sqrt{\frac{\lambda_2}{\lambda_1}}
+-\sqrt{\frac{\lambda_1}{\lambda_2}}
+\right)\\
+&\leq\frac12\left(
+\sqrt{\frac{\overline m}{\underline m}}
+-\sqrt{\frac{\underline m}{\overline m}}
+\right)
+=\chi_\Lambda.
+\end{align*}
+
+We then determine the angular sector. We work with continuous real lifts of the angles. Assume the true angle belongs to a known sector and initialize the effective estimate in that sector:
+\begin{equation}\label{eq:angular-sector}
+\begin{aligned}
+\theta,\ \bar\theta(0)&\in\mathcal I_c
+=[\theta_c-\Delta,\theta_c+\Delta],\\
+0&<\Delta<\frac{\pi}{4}.
+\end{aligned}
+\end{equation}
+
+If both $\theta$ and $\bar\theta$ belong to $\mathcal I_c$, their difference satisfies
+\begin{equation}\label{eq:angle-error-bound}
+\begin{aligned}
+|z|&=|\bar\theta-\theta|\\
+&\leq|\bar\theta-\theta_c|+|\theta-\theta_c|\\
+&\leq2\Delta<\frac{\pi}{2}.
+\end{aligned}
+\end{equation}
+
+Over the chosen angular sector, define the uniform lower bound of the force factor $\rho$ 
+\begin{equation}\label{eq:force-factor-margin}
+\begin{aligned}
+\rho_{\min}&=\cos(2\Delta)-\chi_\Lambda\sin(2\Delta).
+\end{aligned}
+\end{equation}
+
+If $\rho_{\min}>0$, the chosen angular sector is admissible for guaranteeing positive contact force. This sufficient condition is checked before operation using the known angular-sector width and inertia bounds; no online evaluation of the unknown error $z=\bar\theta-\theta$ is required. Moreover, although a sufficiently small positive $\Delta$ makes $\rho_{\min}>0$, the chosen sector must also cover the full range of $\theta$ allowed by the prior information. 
+
+For $|z|\leq2\Delta<\pi/2$, $\cos z=\cos|z|\geq\cos(2\Delta)$ and $|\sin z|\leq\sin(2\Delta)$. Combining these angular bounds with \eqref{eq:coupling-bound} in \eqref{eq:force-factor} yields
+\begin{equation}\label{eq:force-factor-bound}
+\begin{aligned}
+\rho(q,z)
+&\geq\cos z-|r_\Lambda(q)|\,|\sin z|\\
+&\geq\cos(2\Delta)-\chi_\Lambda\sin(2\Delta)
+=\rho_{\min}>0.
+\end{aligned}
+\end{equation}
+
+The last strict inequality is the prescribed sector-width condition. Multiplying by $f_d>0$ then gives the positive lower bound on the actual force through \eqref{eq:reaction-factor}.
+
+Consequently, the angle bound \eqref{eq:angle-error-bound} and force-factor bound \eqref{eq:force-factor-bound} imply the following force margin whenever $\theta,\bar\theta\in\mathcal I_c$:
+\begin{equation}\label{eq:positive-force}
+\begin{aligned}
+f\geq\rho_{\min}f_d>0.
+\end{aligned}
+\end{equation}
+
+\subsubsection{Invariance and Exponential Parameter Convergence}
+
+While $\theta,\bar\theta\in\mathcal I_c$, the error definition \eqref{eq:parameter-error} gives
+\begin{align*}
+\theta+s z=(1-s)\theta+s\bar\theta\in[\theta_c-\Delta,\theta_c+\Delta]
+\end{align*}
+
+for every $s\in[0,1]$. Thus $|\theta-\theta_c+s z|\leq\Delta$, and the integrand defining $H$ satisfies $\cos\Delta\leq\cos(\theta-\theta_c+s z)\leq1$. Hence
+\begin{equation}\label{eq:sine-slope-bound}
+\begin{aligned}
+\cos\Delta\leq H\leq1.
+\end{aligned}
+\end{equation}
+
+Since $\theta$ is constant, the parameter dynamics \eqref{eq:parameter-error-dynamics}, slope bound \eqref{eq:sine-slope-bound}, and force margin \eqref{eq:positive-force} give
+\begin{equation}\label{eq:effective-angle-dynamics}
+\begin{aligned}
+\dot{\bar\theta}&=-\gamma fH(\bar\theta-\theta),\\
+\gamma fH&\geq\gamma\rho_{\min}f_d\cos\Delta>0.
+\end{aligned}
+\end{equation}
+
+If $\bar\theta>\theta$, then $\dot{\bar\theta}<0$ and the estimate decreases; if $\bar\theta<\theta$, then $\dot{\bar\theta}>0$ and the estimate increases. When $\bar\theta=\theta$, its derivative is zero. Thus $\bar\theta$ moves toward the constant true angle and remains there upon reaching it.
+
+The same sign argument applies at the sector boundaries because the true angle satisfies $\theta_c-\Delta\leq\theta\leq\theta_c+\Delta$. At the upper boundary,
+\begin{align*}
+\bar\theta=\theta_c+\Delta
+\quad\Longrightarrow\quad
+\dot{\bar\theta}
+&=-\gamma fH(\theta_c+\Delta-\theta)\leq0.
+\end{align*}
+
+Thus the estimate can only decrease or remain at that boundary. At the lower boundary,
+\begin{align*}
+\bar\theta=\theta_c-\Delta
+\quad\Longrightarrow\quad
+\dot{\bar\theta}
+&=-\gamma fH(\theta_c-\Delta-\theta)\geq0.
+\end{align*}
+
+Thus the estimate can only increase or remain at that boundary. In either case, the derivative is zero precisely when the true angle coincides with the boundary; otherwise it points into the sector.
+
+Starting from $\bar\theta(0)\in\mathcal I_c$, the estimate therefore cannot exit the sector during active-contact evolution and stays between $\bar\theta(0)$ and $\theta$. To verify that unilateral contact itself persists, evaluate the normal acceleration that the same command would produce with the reaction set to zero:
+\begin{equation}\label{eq:free-normal-acceleration}
+\begin{aligned}
+a_{n,\mathrm{free}}
+&=n^T\Lambda^{-1}(F-\eta)\\
+&=-\bigl(n^T\Lambda^{-1}n\bigr)\rho(q,z)f_d<0.
+\end{aligned}
+\end{equation}
+
+At zero gap and zero normal velocity, this acceleration would penetrate the surface, violating $\phi(p)\geq0$. The admissible reaction is determined by \eqref{eq:reaction-factor} and satisfies \eqref{eq:positive-force}, thereby enforcing the contact constraints \eqref{eq:contact-constraints} and zero gap. The reaction has a strictly positive margin, so the active-contact branch cannot end through vanishing contact force. Together with the inward-pointing angular dynamics, this rules out either sector exit or contact loss as a first event. By continuation, $\mathcal I_c$ is forward invariant and unilateral contact is maintained while the trajectory remains in the nonsingular robot operating region. This argument certifies operation in the existing contact mode and introduces no contact-establishment, impact, or mode-transition dynamics.
+
+For $V_z=z^2/2$, this gives
+\begin{align}
+\dot V_z&=-\gamma fHz^2\leq-2\alpha_zV_z,\nonumber\\
+\alpha_z&=\gamma\rho_{\min}f_d\cos\Delta>0,\label{eq:parameter-rate}\\
+|z(t)|&\leq|z(0)|e^{-\alpha_z t}.\label{eq:parameter-convergence}
+\end{align}
+
+The manifold \eqref{eq:parameter-manifold}, with correction \eqref{eq:momentum-correction}, is invariant and exponentially attractive in this domain. No motion persistence of excitation is required: the certified nonzero contact force supplies the parameter-error damping, including during regulation at rest.
+
+The target-system immersion and its dynamic-matching equation are detailed in Appendix~\ref{app:immersion}.
+
+\subsubsection{Motion and Force Tracking}
+
+The disturbance $-f_d\sin z/\Lambda_t$ in the motion-error equation decays exponentially because $\Lambda_t\geq\underline m$ and the angle error obeys \eqref{eq:parameter-convergence}:
+\begin{equation}\label{eq:motion-disturbance-bound}
+\begin{aligned}
+\left|\frac{f_d}{\Lambda_t}\sin z(t)\right|
+&\leq\frac{f_d}{\underline m}|z(0)|e^{-\alpha_z t}.
+\end{aligned}
+\end{equation}
+
+The motion-error system is a stable linear system driven by this exponentially decaying input. Consequently, $e_t$ and $\dot e_t$ converge exponentially to zero, with a rate that may be chosen below both $\alpha_z$ and the nominal motion decay rate. The error geometry \eqref{eq:error-geometry} gives Cartesian error convergence as well.
+
+The force error satisfies
+\begin{equation}\label{eq:force-error-bound}
+\begin{aligned}
+f-f_d&=f_d\left[\cos z-1+r_\Lambda(q)\sin z\right],\\
+|f-f_d|
+&\leq f_d\left(\frac{z^2}{2}+\chi_\Lambda|z|\right).
+\end{aligned}
+\end{equation}
+
+Thus $f\to f_d$ exponentially. Exact force matching holds on $\mathcal M$; away from it there is a transient force error. For regulation, $\dot p\to0$ implies $\beta\to0$ and $\hat\theta\to\theta$. During persistent tracking, it is the effective estimate $\bar\theta$ that converges to $\theta$; the raw internal estimate need not do so because $\beta$ need not vanish.
+
+\paragraph{Scope}
+
+With bounded reference signals, the error estimates also give bounded $p$ and $\dot p$. On a compact smooth nonsingular robot operating region, $m_p$, $g_p$, $\beta$, $\hat\theta$, and the commanded input are bounded. As with FIC 1, the robot conclusions apply while the trajectory remains in that operating region; the angular-sector proof does not certify avoidance of a manipulator singularity.
+
+The sufficient conditions for this construction are therefore an admissible task-space reference, initially established unilateral contact with zero normal velocity, the known robot model and inertia bounds, exact scalar force measurement as in FIC 1, and the stated angular-sector initialization. Within that domain, the strict reaction-force bound proves contact maintenance as well as parameter convergence. Outside the certified angular domain, the constrained reaction formula may fail to yield a strictly positive force, and continued contact and convergence are not guaranteed. Contact establishment, impacts, and contact-mode transitions are outside the analysis.
+
+\subsection{Main Result}
+
+\begin{theorem}[Exponential motion--force tracking under unilateral contact] Consider the two-DoF manipulator and the IAC 1.0.0 controller defined above. Suppose that the following conditions hold:
+
+\begin{enumerate}
+\item The robot kinematics and dynamics are exactly known and smooth on a neighborhood of a compact operating region $\mathcal Q$. The Jacobian is nonsingular there, the inertia satisfies \eqref{eq:inertia-bounds}, and the configuration remains in $\mathcal Q$. Joint position, joint velocity, and the scalar normal force are measured exactly, and the ideal-actuation assumption holds.
+\item The surface \eqref{eq:contact-surface} is fixed and frictionless, with the normal parameterization \eqref{eq:normal-parameterization} for a constant unknown $\theta$. Unilateral contact satisfies \eqref{eq:initial-contact} at initialization.
+\item The reference satisfies $p_d\in C^2([0,\infty);\mathcal S)$, the signals $p_d,\dot p_d,\ddot p_d$ are bounded, and the desired force $f_d>0$ is constant.
+\item For a known center $\theta_c$, the true angle and initial effective estimate satisfy \eqref{eq:angular-sector}. The constant in \eqref{eq:coupling-constant} and margin in \eqref{eq:force-factor-margin} satisfy $\rho_{\min}>0$.
+
+\end{enumerate}
+
+Choose $k_p,k_v,\gamma>0$ and set $k_f=0$. Apply the command \eqref{eq:tracking-command}, the correction \eqref{eq:momentum-correction}, the force law \eqref{eq:adaptive-force-law}, and the torque map \eqref{eq:torque-map}, with the parameter update \eqref{eq:adaptive-update}.
+
+The only online measurements are $q,\dot q,f$; $p_d,\dot p_d,\ddot p_d,f_d$ are available reference signals, and $\hat\theta$ is the internal controller state. The model functions and derivatives are evaluated using \eqref{eq:position}, \eqref{eq:velocity}, \eqref{eq:cartesian-model}, and \eqref{eq:model-derivatives}.
+
+Thus the implementation requires no joint-acceleration measurement or numerical differentiation of the measured force. Initialize the internal estimate according to \eqref{eq:estimate-initialization}.
+
+Then the closed loop has a unique forward-complete solution in the established-contact mode, all closed-loop states and commanded inputs are bounded, and the following properties hold for all $t\geq0$:
+
+\textbf{(i) Angular-domain invariance and contact maintenance.} The effective estimate remains between its initial value and the true angle,
+\begin{equation}\label{eq:estimate-interval}
+\begin{aligned}
+\bar\theta(t)&\in
+\bigl[\min\{\bar\theta(0),\theta\},\\
+&\qquad\max\{\bar\theta(0),\theta\}\bigr]\subseteq\mathcal I_c.
+\end{aligned}
+\end{equation}
+
+The contact constraints \eqref{eq:contact-constraints} and positive-force bound \eqref{eq:positive-force} hold for all time, so unilateral contact persists without detachment.
+
+\textbf{(ii) Exponential convergence of the effective parameter estimate.} The error \eqref{eq:parameter-error} satisfies \eqref{eq:parameter-convergence}, with rate \eqref{eq:parameter-rate}.
+
+Consequently, $\bar n\to n$ exponentially. The manifold \eqref{eq:parameter-manifold} is invariant and exponentially attractive in the transverse coordinate $z$, and its internal dynamics realize FIC 1 with $k_f=0$. No persistence of excitation of the tangential motion is required.
+
+\textbf{(iii) Exponential motion and force tracking.} Define the nominal motion decay rate by
+\begin{equation}\label{eq:nominal-motion-rate}
+\begin{aligned}
+A_m&=\begin{bmatrix}0&1\\-k_p&-k_v\end{bmatrix},\\
+\alpha_m&=-\max\{\operatorname{Re}\mu:\mu\in\operatorname{spec}(A_m)\}>0.
+\end{aligned}
+\end{equation}
+
+For every $0<\alpha<\min\{\alpha_m,\alpha_z\}$, there exists a constant $C_\alpha>0$, independent of time, such that
+\begin{equation}\label{eq:tracking-bounds}
+\begin{aligned}
+\|e_p(t)\|+\|\dot e_p(t)\|
+&\leq C_\alpha e^{-\alpha t}\Bigl(
+\|e_p(0)\|+\|\dot e_p(0)\|\\
+&\qquad\qquad+|z(0)|\Bigr),\\
+|f(t)-f_d|
+&\leq f_d\left(
+\chi_\Lambda|z(0)|e^{-\alpha_z t}
++\frac{|z(0)|^2}{2}e^{-2\alpha_z t}
+\right).
+\end{aligned}
+\end{equation}
+
+Hence $p-p_d\to0$, $\dot p-\dot p_d\to0$, and $f-f_d\to0$ exponentially.
+
+\textbf{(iv) Regulation and the internal estimate.} For a constant reference $p_d$, $\dot p\to0$, $\beta\to0$, and $\hat\theta\to\theta$. For a time-varying reference, the convergence claim concerns the effective estimate \eqref{eq:effective-angle}; the internal estimate $\hat\theta$ need not converge to $\theta$.
+
+\end{theorem}
+
+\begin{IEEEproof}
+The torque map \eqref{eq:torque-map} implements the Cartesian force law \eqref{eq:adaptive-force-law}. Together with the measured-state relations \eqref{eq:position}--\eqref{eq:velocity}, the model definitions \eqref{eq:cartesian-model}, and the update \eqref{eq:adaptive-update}, this is precisely the IAC 1.0.0 construction. Hence \eqref{eq:adaptive-closed-loop} and its derived error equations apply.
+
+On the active-contact branch, the reaction is uniquely determined because $n^T\Lambda^{-1}n>0$. The coupling bound \eqref{eq:coupling-bound} implies \eqref{eq:force-factor-bound} in the sector. The angular dynamics and slope bound are given by \eqref{eq:effective-angle-dynamics} and \eqref{eq:sine-slope-bound}.
+
+The angular vector field points inward at both sector boundaries, and its sign gives the interval property \eqref{eq:estimate-interval}. At zero gap and zero normal velocity, the same command with zero reaction would produce the negative normal acceleration in \eqref{eq:free-normal-acceleration}, which violates nonpenetration. The positive reaction instead enforces zero normal acceleration. The preceding joint continuation argument therefore excludes both sector exit and contact loss, establishing (i).
+
+The Lyapunov estimate leading to \eqref{eq:parameter-rate}--\eqref{eq:parameter-convergence} proves (ii). On $z=0$, $\bar n=n$ and $f=f_d$, so the force law and the dynamics restricted to $\mathcal M$ recover FIC 1; the full immersion identity is given in Appendix~\ref{app:immersion}.
+
+For the motion error, let $y=[e_t\;\dot e_t]^T$. Equation~\eqref{eq:adaptive-motion-error} gives
+\begin{align*}
+\dot y=A_my+
+\begin{bmatrix}0\\-f_d\sin z/\Lambda_t\end{bmatrix}.
+\end{align*}
+
+The input satisfies \eqref{eq:motion-disturbance-bound}. Since $A_m$ in \eqref{eq:nominal-motion-rate} is Hurwitz, variation of constants yields the motion estimate in \eqref{eq:tracking-bounds} for every $\alpha<\min\{\alpha_m,\alpha_z\}$. Equations~\eqref{eq:error-geometry} and \eqref{eq:error-derivatives} transfer it to Cartesian coordinates. Substituting \eqref{eq:parameter-convergence} into \eqref{eq:force-error-bound} gives the force estimate in \eqref{eq:tracking-bounds}, proving (iii).
+
+Bounded reference signals and the motion estimate imply bounded $p$ and $\dot p$. On the assumed compact nonsingular region, $\dot q=J^{-1}\dot p$, the robot model terms, $m_p$, $\beta$, and the commanded inputs are consequently bounded. The sector bound on $\bar\theta$ and $\hat\theta=\bar\theta-\beta$ also bound the estimator state. Smoothness and the positive contact margin permit continuation for all time under the operating-region assumption. Finally, for regulation, $\dot p\to0$ and \eqref{eq:momentum-model}--\eqref{eq:momentum-correction} imply $\beta\to0$, giving (iv). \end{IEEEproof}
+
+The confinement of $q$ to $\mathcal Q$ is an assumption of this theorem; invariance of the angular sector does not establish invariance of the robot operating region. Contact establishment, impacts, and contact-mode transitions remain outside its scope.
+
+\appendices
+\section{Target-System Immersion}\label{app:immersion}
+
+The construction concerns the maintained unilateral-contact branch certified in Section~\ref{sec:iac}.
+
+In differential geometry, an immersion is a smooth map that represents each trajectory of the possibly lower-dimensional FIC 1 target system as a trajectory of the actual adaptive closed loop on $\mathcal M$. The target system, the augmented closed loop, and the manifold are distinct objects, made explicit below.
+
+\subsection{Target and Augmented Closed-Loop Systems}
+
+Maintained rigid contact leaves one motion coordinate $x_t$ and its velocity $\dot x_t$. Fix a smooth inverse-kinematics branch in the nonsingular operating region and denote its contact-state chart by $\mathcal D_\theta\subset\mathbb R^2$. On this branch, write
+\begin{align*}
+q&=q_\theta(x_t),\qquad
+h(q_\theta(x_t))=p_0+Tx_t,\\
+\dot q&=J^{-1}(q_\theta(x_t))T\dot x_t.
+\end{align*}
+
+The subscript $\theta$ records the dependence of the contact geometry on the fixed true parameter. The target state is $\xi=[\xi_1\;\xi_2]^T\in\mathcal D_\theta$, representing the position and velocity of the full-information motion. Using \eqref{eq:intrinsic-position} and \eqref{eq:reference-position}, write the intrinsic command \eqref{eq:intrinsic-command} in target-state coordinates as
+\begin{align*}
+u_{t,\star}(t,\xi_1,\xi_2)
+&=\ddot x_{t,d}+k_v(\dot x_{t,d}-\xi_2)
++k_p(x_{t,d}-\xi_1).
+\end{align*}
+
+FIC 1 then has the two-dimensional target dynamics
+\begin{align*}
+\dot\xi&=\alpha(t,\xi)
+=\begin{bmatrix}
+\xi_2\\
+u_{t,\star}(t,\xi_1,\xi_2)
+\end{bmatrix},\qquad f_\star=f_d.
+\end{align*}
+
+This target realizes the nominal intrinsic error dynamics \eqref{eq:fic-tangential-error} and represents the Cartesian target specified earlier. The explicit time dependence accommodates tracking; a constant reference gives the regulation case.
+
+The actual closed-loop state includes the estimator:
+\begin{align*}
+X&=\begin{bmatrix}x_t&\dot x_t&\hat\theta\end{bmatrix}^T
+\in\mathcal D_\theta\times\mathbb R,\\
+\dot X&=\mathcal F_\theta(t,X)
+=\begin{bmatrix}
+\dot x_t\\
+u_{t,\star}(t,x_t,\dot x_t)
++\dfrac{f_d}{\Lambda_t(q)}\sin z\\
+\gamma T_c^T(g_p+\bar n f)
+\end{bmatrix}.
+\end{align*}
+
+The reaction and transverse coordinate are given by \eqref{eq:reaction-factor} and \eqref{eq:parameter-error}. Here $q,\dot q$ are evaluated on the chosen branch, and $g_p,\bar n$ are the quantities defined by the implemented controller. Thus the actual augmented system is three-dimensional. The true angle $\theta$ is a constant parameter, and the contact force $f$ is determined algebraically by the rigid-contact constraint; neither is an additional dynamic state. The calligraphic $\mathcal F_\theta$ denotes the augmented vector field, whereas $F$ remains the Cartesian force command.
+
+\subsection{Immersion Map and the Manifold}
+
+Restrict the implemented correction to the contact-state chart:
+\begin{align*}
+\beta_\theta(\xi_1,\xi_2)
+&=-\gamma T_c^T\Lambda(q_\theta(\xi_1))T\xi_2.
+\end{align*}
+
+For each fixed true angle $\theta$, define the map from target states to augmented states by
+\begin{align*}
+\pi_\theta:\mathcal D_\theta&\longrightarrow
+\mathcal D_\theta\times\mathbb R,\\
+\pi_\theta(\xi)&=\begin{bmatrix}
+\xi_1\\\xi_2\\\theta-\beta_\theta(\xi_1,\xi_2)
+\end{bmatrix}.
+\end{align*}
+
+By \eqref{eq:parameter-manifold} and the correction \eqref{eq:momentum-correction}, its image is precisely the previously defined parameter manifold:
+\begin{align*}
+\operatorname{im}\pi_\theta=\mathcal M.
+\end{align*}
+
+Thus $\mathcal M$ is a two-dimensional graph in the three-dimensional augmented state space. It contains every admissible plant position and velocity paired with the internal estimate required to make $\bar\theta=\theta$. It includes target transients as well as the final regulated or tracked motion. This parameter manifold is distinct from the physical contact line $\mathcal S$ in the Cartesian workspace.
+
+Writing $D\beta_\theta$ for the row derivative with respect to $(\xi_1,\xi_2)$, the derivative of the map is
+\begin{align*}
+D\pi_\theta(\xi)
+&=\begin{bmatrix}I_2\\-D\beta_\theta(\xi)\end{bmatrix},
+\qquad \operatorname{rank}D\pi_\theta(\xi)=2.
+\end{align*}
+
+It therefore is an immersion in the differential-geometric sense. Since the first two components recover $\xi$ uniquely, it is also an embedding on the chosen contact-state chart. The direction of the map is from the lower-dimensional target state to its representation on $\mathcal M$ inside the augmented closed loop. Although $\pi_\theta$ and $\mathcal M$ depend on the unknown true angle, they are analytical constructions; their evaluation is not required by the controller.
+
+\subsection{Dynamic Matching on the Manifold}
+
+Substituting $X=\pi_\theta(\xi)$ gives $z=0$, $\bar n=n$, and $\rho=1$. Hence $f=f_d$, the Cartesian force law is exactly FIC 1 with $k_f=0$, and the first two components of $\mathcal F_\theta(t,\pi_\theta(\xi))$ equal $\alpha(t,\xi)$. It remains to verify that the internal update supplies the third component required to stay on the graph.
+
+Along a target trajectory, define $m_{p,\star}=\Lambda(q_\theta(\xi_1))T\xi_2$, and let $g_{p,\star}$ denote $g_p$ evaluated with the nominal force $F=\eta+\Lambda T u_{t,\star}-nf_d$. Then
+\begin{align*}
+\frac{d}{dt}m_{p,\star}
+&=\dot\Lambda T\xi_2+\Lambda T u_{t,\star}
+=g_{p,\star}+nf_d,\\
+\frac{d}{dt}\left[\theta-\beta_\theta(\xi_1,\xi_2)\right]
+&=-D\beta_\theta(\xi)\alpha(t,\xi)\\
+&=\gamma T_c^T(g_{p,\star}+nf_d).
+\end{align*}
+
+The last expression equals the update \eqref{eq:adaptive-update} on $\mathcal M$. Consequently, the complete vector fields satisfy the immersion, or dynamic-matching, equation
+\begin{align*}
+\mathcal F_\theta(t,\pi_\theta(\xi))
+&=\begin{bmatrix}
+\alpha(t,\xi)\\
+-D\beta_\theta(\xi)\alpha(t,\xi)
+\end{bmatrix}
+=D\pi_\theta(\xi)\alpha(t,\xi).
+\end{align*}
+
+The map $\pi_\theta$ has no explicit time dependence, so this identity also applies to a time-varying reference. It states that evolving a target state and then mapping its trajectory gives the same result as evolving the actual augmented system from the mapped initial state. In particular,
+\begin{align*}
+X(0)=\pi_\theta(\xi(0))
+\quad&\Longrightarrow\quad
+X(t)=\pi_\theta(\xi(t)),\\
+x_t(t)&=\xi_1(t),\qquad \dot x_t(t)=\xi_2(t).
+\end{align*}
+
+The estimator component follows from \eqref{eq:parameter-manifold} and \eqref{eq:momentum-correction}. Thus the target dynamics are realized exactly by the actual closed loop restricted to $\mathcal M$. This is the specific dynamic-matching construction behind the direct I\&I framework.
+
+\subsection{Immersion, Invariance, and Attractivity}
+
+Immersion represents target trajectories within the augmented closed loop, whereas invariance preserves trajectories initialized on $\mathcal M$. Attraction follows from \eqref{eq:parameter-convergence} in the admissible angular domain. Away from $\mathcal M$, \eqref{eq:adaptive-motion-error} contains a transient disturbance, and \eqref{eq:force-error-bound} describes the force mismatch. Both vanish as $z\to0$. The estimates in \eqref{eq:tracking-bounds} establish physical tracking convergence separately from parameter-manifold attraction.
+
+\bibliographystyle{IEEEtran}
+\bibliography{bib}
+
+\end{document}
